@@ -49,8 +49,20 @@ class Invoice(models.Model):
         INVOICE = 'invoice', ('Invoice')
         CREDIT_NOTE = 'credit_note', ('Credit Note')
 
+    class PaymentStatus(models.TextChoices):
+        PENDING = 'pending', ('Pending')       # created but not yet due
+        UNPAID = 'unpaid', ('Unpaid')         # overdue / not paid
+        PAID = 'paid', ('Paid')               # payment received
+        CANCELED = 'canceled', ('Canceled')   # invoice is canceled (storno)
+
     invoice_number = models.CharField(max_length=50, unique=True)
 
+    invoice_type = models.CharField(
+        max_length=20,
+        choices=InvoiceType.choices,
+        default=InvoiceType.INVOICE
+    )
+    
     invoice_type = models.CharField(
         max_length=20,
         choices=InvoiceType.choices,
@@ -79,6 +91,8 @@ class Invoice(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    is_finalized = models.BooleanField(default=False)
+
     def __str__(self):
         return f"Invoice {self.invoice_number}"
     
@@ -104,9 +118,9 @@ class InvoiceService(models.Model):
         blank=True
     )
 
-    provision = models.DecimalField(decimal_places=2)
-    amount = models.DecimalField(decimal_places=2)
-    investitions_amount = models.DecimalField(decimal_places=2)
+    provision = models.DecimalField(decimal_places=2, max_digits=10)
+    amount = models.DecimalField(decimal_places=2, max_digits=10)
+    investitions_amount = models.DecimalField(decimal_places=2, max_digits=10)
 
     def __str__(self):
         return (
