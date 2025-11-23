@@ -31,7 +31,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
         response.set_cookie(
             key='access_token',
-            value=access,
+            value=str(access),
             httponly=True,
             secure=True,
             samesite="Lax"
@@ -39,13 +39,14 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
         response.set_cookie(
             key='refresh_token',
-            value=refresh,
+            value=str(refresh),
             httponly=True,
             secure=True,
             samesite='Lax'
         )
 
         response.data = {'message': 'Du bist angemeldet'}
+        return response
 
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
