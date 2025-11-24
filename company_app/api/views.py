@@ -8,7 +8,7 @@ class CompanyView(APIView):
     def get(self, request):
         company = Company.objects.first()
         if not company:
-            return Response({"detail": "Company not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Company not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = CompanySerializer(company)
         return Response(serializer.data)
     
@@ -26,5 +26,5 @@ class CompanyView(APIView):
         serializer = CompanySerializer(company, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"message": "Die Daten wurden aktualisiert."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
