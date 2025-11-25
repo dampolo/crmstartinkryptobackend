@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from auth_app.models import User
 
 class Customer(models.Model):
     class TitleChoices(models.TextChoices):
@@ -7,6 +8,7 @@ class Customer(models.Model):
         FRAU = 'frau', _('Frau')
         DIVERS = 'divers', _('Divers')
     
+    user = models.ForeignKey(User, related_name='customer', on_delete=models.PROTECT, default="")
     photo = models.ImageField(upload_to='customers/photos/', blank=True, null=True)
     customer_number = models.CharField(max_length=50, unique=True)
     title = models.CharField(max_length=20, choices=TitleChoices)
