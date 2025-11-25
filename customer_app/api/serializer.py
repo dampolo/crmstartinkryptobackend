@@ -15,6 +15,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = Customer
         fields = [
             'id',
+            'user',
             'photo',
             'customer_number',
             'title',
@@ -34,7 +35,7 @@ class CustomerSerializer(serializers.ModelSerializer):
             'comments'
         ]
 
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', "user"]
 
     def create(self, validated_data):
         comments_data = validated_data.pop('comments', [])
@@ -45,3 +46,16 @@ class CustomerSerializer(serializers.ModelSerializer):
             CustomerComment.objects.create(customer=customer, **comment)
 
         return customer
+    
+    def update(self, instance, validated_data):
+        # Extract nested comments if provided
+        validated_data.pop('comments', [])
+
+        # Extract customer_number if client tries to send it
+        validated_data.pop('customer_number', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
