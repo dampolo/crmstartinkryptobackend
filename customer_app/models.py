@@ -4,9 +4,9 @@ from auth_app.models import User
 
 class Customer(models.Model):
     class TitleChoices(models.TextChoices):
-        HERR = 'herr', _('Herr')
-        FRAU = 'frau', _('Frau')
-        DIVERS = 'divers', _('Divers')
+        HERR = 'Herr', _('Herr')
+        FRAU = 'Frau', _('Frau')
+        DIVERS = 'Divers', _('Divers')
     
     user = models.ForeignKey(User, related_name='customer', on_delete=models.PROTECT, default="")
     photo = models.ImageField(upload_to='customers/photos/', blank=True, null=True)

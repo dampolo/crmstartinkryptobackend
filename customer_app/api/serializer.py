@@ -35,10 +35,12 @@ class CustomerSerializer(serializers.ModelSerializer):
             'comments'
         ]
 
-        read_only_fields = ['created_at', 'updated_at', "user"]
-
+        read_only_fields = ['created_at', 'updated_at', 'user', 'customer_number']
+    
     def create(self, validated_data):
         comments_data = validated_data.pop('comments', [])
+        
+        validated_data['customer_number'] = generate_customer_number()
 
         customer = Customer.objects.create(**validated_data)
 
@@ -59,3 +61,18 @@ class CustomerSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+def generate_customer_number():
+    from django.db.models import Max
+    from django.db.models.functions import Substr, Cast
+    from django.db.models import IntegerField
+
+    last_number = (
+        Customer.objects
+        .annotate(num=Cast(Substr('customer_number', 3), IntegerField()))
+        .aggregate(max_num=Max('num'))['max_num']
+    )
+
+    next_number = (last_number + 1) if last_number else 1
+    
+    return f"SK{next_number:06d}"
