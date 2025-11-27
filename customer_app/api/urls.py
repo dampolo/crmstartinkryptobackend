@@ -10,6 +10,6 @@ urlpatterns = [
     path('', include(router.urls)),
      # LIST + CREATE
     path('customers/<int:customer_id>/comments/', CustomerCommentListCreate.as_view()),
-     # RETRIEVE + UPDATE + DELETE
+     # RETRIEVE + UPDATE
     path('customers/<int:customer_id>/comments/<int:pk>/', CustomerCommentDetail.as_view())
 ]

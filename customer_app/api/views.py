@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializer import CustomerSerializer, CustomerCommentSerializer
 from customer_app.models import Customer, CustomerComment
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, UpdateAPIView
 
 
 class CustomerView(ModelViewSet):
@@ -21,8 +21,8 @@ class CustomerCommentListCreate(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(customer_id=self.kwargs['customer_id'])
 
- # RETRIEVE + UPDATE + DELETE
-class CustomerCommentDetail(RetrieveUpdateDestroyAPIView):
+ # RETRIEVE + UPDATE
+class CustomerCommentDetail(ListCreateAPIView):
     serializer_class = CustomerCommentSerializer
 
     def get_queryset(self):
