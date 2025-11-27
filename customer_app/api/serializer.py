@@ -3,10 +3,18 @@ from customer_app.models import Customer, CustomerComment
 
 
 class CustomerCommentSerializer(serializers.ModelSerializer):
+    text = serializers.CharField(allow_blank=True)
+    
     class Meta:
         model = CustomerComment
         fields = ['id', 'text', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def validate_text(self, value):
+        # Strip whitespace and check for empty result
+        if not value.strip():
+            raise serializers.ValidationError("Comment text cannot be empty.")
+        return value
 
 class CustomerSerializer(serializers.ModelSerializer):
     comments = CustomerCommentSerializer(many=True, required=False)
