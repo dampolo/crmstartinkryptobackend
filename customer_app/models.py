@@ -19,7 +19,7 @@ class Customer(models.Model):
     post_code = models.CharField(max_length=20)
     city = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=50, blank=True)
+    phone = models.CharField(max_length=50)
     has_portfolio = models.BooleanField(default=False)
     has_subscription = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

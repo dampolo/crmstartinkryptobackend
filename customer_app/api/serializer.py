@@ -43,7 +43,7 @@ class CustomerSerializer(serializers.ModelSerializer):
             'comments'
         ]
 
-        read_only_fields = ['created_at', 'updated_at', 'user']
+        read_only_fields = ['created_at', 'updated_at', 'user', 'customer_number']
     
     def create(self, validated_data):
         comments_data = validated_data.pop('comments', [])
