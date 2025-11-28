@@ -45,6 +45,11 @@ class CustomerSerializer(serializers.ModelSerializer):
 
         read_only_fields = ['created_at', 'updated_at', 'user', 'customer_number']
     
+    def validate_post_code(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError("Post code must contain numbers only.")
+        return value
+
     def create(self, validated_data):
         comments_data = validated_data.pop('comments', [])
         

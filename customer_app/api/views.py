@@ -2,6 +2,8 @@ from rest_framework.viewsets import ModelViewSet
 from .serializer import CustomerSerializer, CustomerCommentSerializer
 from customer_app.models import Customer, CustomerComment
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework import status
+from rest_framework.response import Response
 
 
 class CustomerView(ModelViewSet):
@@ -20,6 +22,7 @@ class CustomerCommentListCreate(ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(customer_id=self.kwargs['customer_id'])
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
  # RETRIEVE + UPDATE
 class CustomerCommentDetail(RetrieveUpdateAPIView):
