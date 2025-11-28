@@ -5,7 +5,6 @@ import re
 from datetime import datetime
 
 class CompanySerializer(serializers.ModelSerializer):
-    email = serializers.EmailField()
 
     class Meta:
         model = Company
