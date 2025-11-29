@@ -1,0 +1,109 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <link rel="stylesheet" href="{% static 'styles/style.css' %}">
+</head>
+<body>
+
+    <section>
+
+  <div class="invoice-container">
+    <header class="invoice-header">
+        <div class="company-info">
+        <h1>{{company.name}}</h1>
+        <p>{{company.street}} {{company.number}}<br>{{company.postcode}} {{companyControl.city}} </p>
+        </div>
+        <a href="/" class="logo">
+        <img width="60" height="60" src="./assets/SK-metatag.png" alt="Start in Krypto">
+        </a>
+        <div class="invoice-info">
+        <h2>RECHNUNG</h2>
+        <p>Rechnung Nr.: {{ customer.customer_number }}</p>
+        <p>Kundennr.: {{customer.customer_number}}</p>
+        <p>Date: {{ customer.created_at }}</p>
+        </div>
+    </header>
+
+    <div class="bill-to">
+        <h3>Rechnung an:</h3>
+        <address>
+        {% comment %} <strong>{{customerNameInvoice}}</strong><br> {% endcomment %}
+        {% comment %} {{customerStreetInvoice}}<br> {% endcomment %}
+        {% comment %} {{customerCityInvoice}} {% endcomment %}
+        {% comment %} </address> {% endcomment %}
+    </div>
+
+    <table class="invoice-table">
+        <thead>
+        <tr>
+            <th>Service</th>
+            <th>Provison</th>
+            <th>Gebühr</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Grundgebühr</td>
+            <td></td>
+            {% comment %} <td>{{algorithmusControl.basicFeeProvision | number:'1.2-2'}} €</td> {% endcomment %}
+        </tr>
+        <tr>
+            <td>Individuelle Express Krypto-Einführung</td>
+            {% comment %} <td>{{algorithmusControl.firstStepProvision | number:'1.2-2'}} %</td> {% endcomment %}
+            {% comment %} <td>{{firstStepAmount | number:'1.2-2' }} €</td> {% endcomment %}
+        </tr>
+        <tr>
+            <td>Börsenwahl & Einrichtung</td>
+            {% comment %} <td>{{algorithmusControl.exchangeSetupProvision | number:'1.2-2'}} %</td> {% endcomment %}
+            {% comment %} <td>{{exchangeSetupAmount | number:'1.2-2' }} €</td> {% endcomment %}
+        </tr> 
+        <tr>
+            <td>Kaufstrategie & Coin-Auswahl</td>
+            {% comment %} <td>{{algorithmusControl.buyStrategyProvision | number:'1.2-2'}} %</td> {% endcomment %}
+            {% comment %} <td>{{buyStrategyAmount | number:'1.2-2' }} €</td> {% endcomment %}
+        </tr>
+        <tr>
+            <td>Wallet-Einrichtung & Sicherheit</td>
+            {% comment %} <td>{{algorithmusControl.walletSetupProvision | number:'1.2-2'}} %</td> {% endcomment %}
+            {% comment %} <td>{{walletSetupAmount | number:'1.2-2' }} €</td> {% endcomment %}
+        </tr>
+        <tr>
+            <td>Steuertool für deine Abwicklung</td>
+            {% comment %} <td>{{algorithmusControl.taxToolProvision | number:'1.2-2'}} %</td> {% endcomment %}
+            {% comment %} <td>{{walletSetupAmount | number:'1.2-2' }} €</td> {% endcomment %}
+        </tr>
+        <tr>
+            <td>Laufende Betreuung</td>
+            <td></td>
+            {% comment %} <td>{{algorithmusControl.ongoingSupportProvision| number:'1.2-2' }} €</td> {% endcomment %}
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="totals">
+        {% comment %} <p><span>Investitions Betrag:</span> <span>{{ investmentAmount| number:'1.2-2' }} €</span></p> {% endcomment %}
+        {% comment %} <p><span>Provison (6.5%):</span> <span>{{totalProvision| number:'1.2-2' }} €</span></p> {% endcomment %}
+        {% comment %} <p><span>MwSt. (19%):</span> <span>{{valueAddedTax | number:'1.2-2' }} €</span></p> {% endcomment %}
+        {% comment %} <h3><span>Total:</span> <span>{{totalAmount | number:'1.2-2' }} €</span></h3> {% endcomment %}
+    </div>
+
+    <footer>
+        <p>
+        Bitte überweisen Sie den Gesamtbetrag innerhalb von 14 Tagen nach Erhalt dieser Rechnung.
+        Zahlungen können per Banküberweisung oder in Kryptowährung erfolgen.
+        Bei Fragen zu dieser Rechnung kontaktieren Sie uns bitte unter:
+        <a href="mailto:elisabeth@startinkrypto.de">elisabeth@startinkrypto.de</a>.
+        </p>
+        <p>BLZ: {{company.swift_code}}</p>
+        <p> Bankverbindung: {{company.bank_account}}, USt-Idnr: {{company.tax_umber}}</p>
+    </footer>
+  </div>
+</section>
+    
+</body>
+</html>

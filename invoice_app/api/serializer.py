@@ -10,3 +10,4 @@ class InvoiceServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceService
         fields = '__all__'
+

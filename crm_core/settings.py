@@ -94,7 +94,9 @@ ROOT_URLCONF = 'crm_core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'invoice_app/templates/invoice/'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
