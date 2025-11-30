@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'customer_app',
     'invoice_app',
     'auth_app',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [

@@ -82,18 +82,32 @@ class Invoice(models.Model):
         on_delete=models.PROTECT
     )
     
-    # snapshot of address at invoice creation
+     # --- CUSTOMER SNAPSHOT ---
     customer_name = models.CharField(max_length=200)
     customer_address = models.TextField()
     
-    # Saved final PDF
-    # pdf_file = models.FieldFile(updated_at="invoices/", null=True, blank=True)
+     # --- COMPANY SNAPSHOT ---
+    company_name = models.CharField(max_length=255)
+    company_street = models.CharField(max_length=255)
+    company_number = models.CharField(max_length=20)
+    company_postcode = models.CharField(max_length=10)
+    company_city = models.CharField(max_length=100)
+    company_tax_number = models.CharField(max_length=50)
+    company_email = models.EmailField()
+    company_bank = models.CharField(max_length=100)
+    company_bank_account = models.CharField(max_length=34)
+    company_swift_code = models.CharField(max_length=20)
+    company_logo = models.ImageField(upload_to='invoice_company_logos/', null=True, blank=True)
 
+    # --- PDF FILE ---
+    pdf_file = models.FileField(upload_to="invoices/", null=True, blank=True)
+
+    # --- STATUS INFO ---
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
     is_finalized = models.BooleanField(default=False)
 
+    # --- INVOICE TOTALS ---
     provision = models.DecimalField(decimal_places=2, max_digits=10)
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     investitions_amount = models.DecimalField(decimal_places=2, max_digits=10)
