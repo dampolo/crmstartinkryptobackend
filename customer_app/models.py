@@ -8,7 +8,7 @@ class Customer(models.Model):
         FRAU = 'Frau', _('Frau')
         DIVERS = 'Divers', _('Divers')
     
-    user = models.ForeignKey(User, related_name='customer', on_delete=models.PROTECT, default="")
+    user = models.ForeignKey(User, related_name='customer', on_delete=models.PROTECT)
     photo = models.ImageField(upload_to='customers/photos/', blank=True, null=True)
     customer_number = models.CharField(max_length=50, unique=True)
     title = models.CharField(max_length=20, choices=TitleChoices)

@@ -36,14 +36,6 @@ class ServiceCatalog(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.price_type})"
-    
-
-class ServiceCatalogForSpecificInvoice(models.Model):
-    name = models.CharField(max_length=200)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f'{self.name} {self.amount}'
 
 class Invoice(models.Model):
     class InvoiceType(models.TextChoices):
@@ -123,23 +115,18 @@ class InvoiceService(models.Model):
         on_delete=models.PROTECT
     )
 
-    service_catalog = models.ForeignKey(
-        ServiceCatalogForSpecificInvoice,
-        null=True,
-        blank=True,
-        related_name="invoice_items",
-        on_delete=models.PROTECT
-    )
-
-     # Custom service name from frontend (special unique service)
-    custom_service_name = models.CharField(
+    # CUSTOM service name (frontend-defined or copied from catalog)
+    service_name = models.CharField(
         max_length=200,
         null=True,
         blank=True
     )
 
+    # PRICE for this line item
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
     def __str__(self):
-        return (
-            self.custom_service_name or 
-            (self.service_catalog.name if self.service_catalog else "Service")
-        )
+        return f"Invoice {self.service_name}"

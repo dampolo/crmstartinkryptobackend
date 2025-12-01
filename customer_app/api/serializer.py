@@ -31,7 +31,7 @@ class CustomerSerializer(serializers.ModelSerializer):
             'last_name',
             'street',
             'number',
-            'post_code',
+            'postcode',
             'city',
             'email',
             'phone',

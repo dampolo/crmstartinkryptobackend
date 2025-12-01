@@ -20,11 +20,14 @@ class InvoiceView(ModelViewSet):
         services_data = data.pop("services", [])
 
         # 1. Validate and create the invoice (without snapshots)
+        data["invoice_number"] = generate_invoice_number()
+
+        # 2. Validate and create the invoice (without snapshots)
         serializer = InvoiceSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-        invoice = serializer.save()
+        invoice = serializer.save(user=request.user)
 
-        # 2. CUSTOMER SNAPSHOT
+        # 3. CUSTOMER SNAPSHOT
         customer = invoice.customer
         invoice.customer_name = f"{customer.first_name} {customer.last_name}"
         invoice.customer_address = (
@@ -32,7 +35,7 @@ class InvoiceView(ModelViewSet):
             f"{customer.postcode} {customer.city}"
         )
 
-        # 3. COMPANY SNAPSHOT
+        # 4. COMPANY SNAPSHOT
         company = Company.objects.first()
 
         invoice.company_name = company.name
@@ -49,12 +52,11 @@ class InvoiceView(ModelViewSet):
 
         invoice.save()
 
-        # 4. CREATE INVOICE SERVICES
+        # 5. CREATE INVOICE SERVICES
         for service in services_data:
             InvoiceService.objects.create(
             invoice=invoice,
-            service_catalog=service.get("service_catalog"),
-            custom_service_name=service.get("custom_service_name") or service.get("name"),
+            service_name=service.get("service_name"),
             amount=service.get("amount", 0),
         )
             
@@ -103,3 +105,32 @@ class InvoiceView(ModelViewSet):
 class InvoiceServiceView(ModelViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceServiceSerializer
+
+
+def generate_invoice_number():
+    """
+    Generate a new sequential invoice number with the format: #000001
+    
+    The function:
+    - Extracts the numeric part from existing invoice numbers (after #')
+    - Finds the highest existing number
+    - Increments it by 1
+    - Returns the new number formatted with leading zeros
+    """
+    from django.db.models import Max
+    from django.db.models.functions import Substr, Cast
+    from django.db.models import IntegerField
+
+    # Annotate each customer with the numeric portion of customer_number
+    # Example: "#000123" → 123
+    last_invoice = (
+        Invoice.objects
+        .annotate(num=Cast(Substr('invoice_number', 3), IntegerField()))
+        .aggregate(max_num=Max('num'))['max_num']
+    )
+
+    # If at least one number exists, increment it; otherwise start at 1
+    next_number = (last_invoice + 1) if last_invoice else 1
+    
+    # Format result as # + 6-digit zero-padded number
+    return f"#{next_number:06d}"
