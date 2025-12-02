@@ -3,6 +3,7 @@ from customer_app.models import Customer, CustomerComment
 
 
 class CustomerCommentSerializer(serializers.ModelSerializer):
+    # With allow_blank=True you give decision to the validation method validate_text.
     text = serializers.CharField(allow_blank=True)
     
     class Meta:
