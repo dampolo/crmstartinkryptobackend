@@ -7,8 +7,8 @@ class CustomerCommentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CustomerComment
-        fields = ['id', 'text', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'text', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
     def validate_text(self, value):
         # Strip whitespace and check for empty result
@@ -51,15 +51,21 @@ class CustomerSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        comments_data = validated_data.pop('comments', [])
+        request = self.context['request']   # <-- get request here
+        user = request.user                 # <-- authenticated user
         
+        comments_data = validated_data.pop('comments', [])
         validated_data['customer_number'] = generate_customer_number()
 
         customer = Customer.objects.create(**validated_data)
 
-        for comment in comments_data:
-            CustomerComment.objects.create(customer=customer, **comment)
 
+        for comment in comments_data:
+            CustomerComment.objects.create(
+                customer=customer,
+                user=user,      # <-- ADD THIS
+                **comment
+            )
         return customer
     
     def update(self, instance, validated_data):

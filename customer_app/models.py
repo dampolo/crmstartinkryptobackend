@@ -31,6 +31,13 @@ class Customer(models.Model):
         return f"{self.first_name} {self.last_name} ({self.customer_number})"
     
 class CustomerComment(models.Model):
+    user = models.ForeignKey(
+    User,
+    related_name='comments',
+    on_delete=models.PROTECT,
+    null=True,
+    blank=True
+)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

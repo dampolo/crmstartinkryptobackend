@@ -20,10 +20,6 @@ class CustomerCommentListCreate(ListCreateAPIView):
     def get_queryset(self):
         return CustomerComment.objects.filter(customer_id=self.kwargs['customer_id'])
 
-    def perform_create(self, serializer):
-        serializer.save(customer_id=self.kwargs['customer_id'])
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
  # RETRIEVE + UPDATE
 class CustomerCommentDetail(RetrieveUpdateAPIView):
     serializer_class = CustomerCommentSerializer
