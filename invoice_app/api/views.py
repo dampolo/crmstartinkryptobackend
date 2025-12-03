@@ -94,16 +94,22 @@ class InvoiceView(ModelViewSet):
             status=status.HTTP_200_OK
         )
     
-    @action(detail=False, methods=['get'])
+    @action(detail=True, methods=['get'])
     def preview(self, request, pk=None):
+        invoice = self.get_object()
+        
         company = Company.objects.first()
-        customer = Customer.objects.first()
+        customer = invoice.customer
 
         # invoice = self.get_object()
-        return render(request, "invoice.html", {"company": company, 'customer': customer})
+        return render(request, "invoice.html", {
+            "company": company, 
+            'customer': customer, 
+            'invoice': invoice
+            })
 
 class InvoiceServiceView(ModelViewSet):
-    queryset = Invoice.objects.all()
+    queryset = InvoiceService.objects.all()
     serializer_class = InvoiceServiceSerializer
 
 

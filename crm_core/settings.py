@@ -20,6 +20,7 @@ env = environ.Env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Initialise environment variables
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
