@@ -166,7 +166,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Additional dirs for development
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / "invoice_app" / "static",  # IMPORTANT
 ]
 
 # Default primary key field type

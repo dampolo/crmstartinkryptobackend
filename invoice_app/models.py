@@ -3,15 +3,15 @@ from customer_app.models import Customer
 from django.utils.translation import gettext_lazy as _
 from auth_app.models import User
 
+class PriceType(models.TextChoices):
+    FIXED = 'fixed', _('Fixed Amount (€)')
+    PERCENT = 'percent', _('Percentage (%)')
 
 class ServiceCatalog(models.Model):
-    class PriceType(models.TextChoices):
-        FIXED = 'fixed', _('Fixed Amount (€)')
-        PERCENT = 'percent', _('Percentage (%)')
 
     name = models.CharField(max_length=200)
 
-    price_type = models.CharField(
+    provision_type = models.CharField(
         max_length=20,
         choices=PriceType.choices,
         default=PriceType.FIXED
@@ -122,6 +122,29 @@ class InvoiceService(models.Model):
         blank=True
     )
 
+    # Price type (fixed or percent)
+    provision_type = models.CharField(
+        max_length=20,
+        choices=PriceType.choices,
+        default=PriceType.FIXED
+    )
+
+     # If FIXED → this field is used
+    provision_fixed = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    # If PERCENT → this field is used
+    provision_percent = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Percentage as decimal (e.g. 0.05 = 5%)"
+    )
     # PRICE for this line item
     amount = models.DecimalField(
         max_digits=10,

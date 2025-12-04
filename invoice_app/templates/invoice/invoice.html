@@ -1,5 +1,6 @@
 {% load static %}
 
+
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -18,9 +19,7 @@
               {{ company.street }} {{ company.number }}<br />{{ company.postcode }} {{ companyControl.city }}
             </p>
           </div>
-          <a href="/" class="logo">
-            <img src="{{ company.logo.url }}" width="60" height="60" alt="{{ company.name }}">
-            </a>
+          <a href="/" class="logo"><img src="{{ company.logo.url }}" width="60" height="60" alt="{{ company.name }}" /></a>
           <div class="invoice-info">
             <h2>RECHNUNG</h2>
             <p>Rechnung Nr.: {{ customer.customer_number }}</p>
@@ -47,15 +46,19 @@
             </tr>
           </thead>
           <tbody>
-
             {% for service in invoice.services.all %}
               <tr>
                 <td>{{ service.service_name }}</td>
-                <td>{{ invoice.provision }} %</td>
+
+                {% if service.provision_type == 'percent' %}
+                  <td>{{ service.provision_percent }} %</td>
+                {% else %}
+                  <td></td> {# or just omit the column #}
+                {% endif %}
+
                 <td>{{ service.amount }} €</td>
               </tr>
             {% endfor %}
-
           </tbody>
         </table>
 

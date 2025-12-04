@@ -57,6 +57,11 @@ class InvoiceView(ModelViewSet):
             InvoiceService.objects.create(
             invoice=invoice,
             service_name=service.get("service_name"),
+
+            provision_type=service.get("provision_type"),
+            provision_fixed=service.get("provision_fixed"),
+            provision_percent=service.get("provision_percent"),
+
             amount=service.get("amount", 0),
         )
             
@@ -75,7 +80,7 @@ class InvoiceView(ModelViewSet):
     def update_status(self, request, pk=None):
         invoice = self.get_object()
 
-        new_status = request.data.get("payment_status")
+        new_status = request.data.get("invoice_status")
 
         # Validate input
         valid_statuses = dict(Invoice.PaymentStatus.choices).keys()
@@ -86,7 +91,7 @@ class InvoiceView(ModelViewSet):
             )
 
         # Update status
-        invoice.payment_status = new_status
+        invoice.invoice_status = new_status
         invoice.save()
 
         return Response(

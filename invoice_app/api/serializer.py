@@ -4,7 +4,7 @@ from invoice_app.models import Invoice, InvoiceService
 class InvoiceServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceService
-        fields = ["id", "service_name", "amount"]
+        fields = ["id", "service_name", "provision_type", "provision_fixed", "provision_percent", "amount"]
 
 class InvoiceSerializer(serializers.ModelSerializer):
     services = InvoiceServiceSerializer(many=True, read_only= True)
