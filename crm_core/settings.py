@@ -70,6 +70,8 @@ CSRF_TRUSTED_ORIGINS = [
 
     'http://127.0.0.1:5500',
 
+    'http://127.0.0.1:4200',
+
     'http://localhost:4200',
 
     'http://localhost:5500',
@@ -82,9 +84,15 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+CSRF_COOKIE_SECURE = False   # True in production
+
+SESSION_COOKIE_SECURE = False  # True in production
+
 CORS_ALLOWED_ORIGINS = [
 
     'http://127.0.0.1:5500',
+
+    'http://127.0.0.1:4200',
 
     'http://localhost:4200',
 
@@ -197,6 +205,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
+
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
