@@ -84,10 +84,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_COOKIE_SECURE = False   # True in production
-
-SESSION_COOKIE_SECURE = False  # True in production
-
 CORS_ALLOWED_ORIGINS = [
 
     'http://127.0.0.1:5500',
@@ -198,11 +194,12 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+    'auth_app.authentication.CookieJWTAuthentication',   # FIRST!
+    'rest_framework_simplejwt.authentication.JWTAuthentication',
+    'rest_framework.authentication.SessionAuthentication',
     ]
 }
 

@@ -38,17 +38,16 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             key='access_token',
             value=access,
             httponly=True,
-            secure=False,
+            secure=True,
             samesite='Lax',
             path='/'
         )
-
 
         response.set_cookie(
             key='refresh_token',
             value=refresh,
             httponly=True,
-            secure=False,
+            secure=True,
             samesite='Lax',
             path='/'
         )
@@ -93,10 +92,20 @@ class CookieTokenRefreshView(TokenRefreshView):
         return response
 
 
-@api_view(['GET'])
-def me(request):
-    print("COOKIES SENT TO /me/:", request.COOKIES)
-    return Response({
-        'id': request.user.id,
-        'username': request.user.username
-    })
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username
+        })
+
+
+class LogoutView(APIView): 
+    permission_classes = [IsAuthenticated]
+    def post(self, response): 
+        response = Response({'message': 'Logged out'}) 
+        response.delete_cookie('access_token', path='/') 
+        response.delete_cookie('refresh_token', path='/') 
+        
+        return response
