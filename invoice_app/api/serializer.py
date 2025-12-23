@@ -1,10 +1,15 @@
 from rest_framework import serializers
-from invoice_app.models import Invoice, InvoiceService
+from invoice_app.models import Invoice, InvoiceService, ServiceCatalog
 
 class InvoiceServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceService
         fields = ["id", "service_name", "provision_type", "provision_fixed", "provision_percent", "amount"]
+
+class ServiceCatalogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceCatalog
+        fields = ["name", "provision_type", "amount_fixed", "amount_percent"]
 
 class InvoiceSerializer(serializers.ModelSerializer):
     services = InvoiceServiceSerializer(many=True, read_only= True)

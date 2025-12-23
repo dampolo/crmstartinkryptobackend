@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
-from .serializer import InvoiceSerializer, InvoiceServiceSerializer
-from invoice_app.models import Invoice, InvoiceService
+from .serializer import InvoiceSerializer, InvoiceServiceSerializer, ServiceCatalogSerializer
+from invoice_app.models import Invoice, InvoiceService, ServiceCatalog
 from customer_app.models import Customer
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -145,3 +145,7 @@ def generate_invoice_number():
     
     # Format result as # + 6-digit zero-padded number
     return f"#{next_number:06d}"
+
+class ServiceCatalogView(ModelViewSet):
+    queryset = ServiceCatalog.objects.all()
+    serializer_class = ServiceCatalogSerializer
