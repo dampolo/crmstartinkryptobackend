@@ -6,11 +6,6 @@ class InvoiceServiceSerializer(serializers.ModelSerializer):
         model = InvoiceService
         fields = ["id", "service_name", "provision_type", "provision_fixed", "provision_percent", "amount"]
 
-class ServiceCatalogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ServiceCatalog
-        fields = ["name", "provision_type", "amount_fixed", "amount_percent"]
-
 class InvoiceSerializer(serializers.ModelSerializer):
     services = InvoiceServiceSerializer(many=True, read_only= True)
 
@@ -68,3 +63,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'services',
         ]
 
+class ServiceCatalogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceCatalog
+        fields = ["name", "provision_type", "amount_fixed", "amount_percent"]

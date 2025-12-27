@@ -9,6 +9,7 @@ from rest_framework.decorators import action
 from django.shortcuts import render
 from company_app.models import Company
 from rest_framework import status
+from django.db import transaction
 
 # You can onyl see the list of the invoices but you cannot change the invoice
 class InvoiceView(ModelViewSet):
@@ -149,3 +150,55 @@ def generate_invoice_number():
 class ServiceCatalogView(ModelViewSet):
     queryset = ServiceCatalog.objects.all()
     serializer_class = ServiceCatalogSerializer
+
+    @action(detail=False, methods=['put'])
+    def bulk_update(self, request):
+
+        data = request.data
+
+        errors = []
+        saved = []
+
+        with transaction.atomic():
+            for index, item in enumerate(data):
+                item_id = item.get('id')
+            
+            if item_id is not None:
+                instance = ServiceCatalog.objects.filter(pk=item_id).first()
+            
+            serializer = self.get_serializer(
+                instance=instance,
+                data=item,
+                partial=False,
+            )
+
+            if serializer.is_valid():
+                obj = serializer.save()
+                saved.append(ServiceCatalogSerializer(obj).data)
+            else:
+                errors.append(
+                    {
+                        'index': index,
+                        'error': serializer.errors
+                    }
+                )
+            
+            if errors:
+                transaction.set_rollback(True)
+                return Response(
+                    {
+                        'status': 'failed',
+                        'message': 'Validation failed. No changes were applied.',
+                        'errors': errors,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            
+            return Response(
+                {
+                    'status': 'OK',
+                    'count': len(saved),
+                    'results': saved,
+                },
+                status=status.HTTP_200_OK,
+            )
