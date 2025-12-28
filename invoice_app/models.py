@@ -28,7 +28,7 @@ class ServiceCatalog(models.Model):
     # Percent amount (example: 0.05 = 5%)
     amount_percent = models.DecimalField(
         max_digits=10,
-        decimal_places=4,
+        decimal_places=2,
         null=True,
         blank=True,
         help_text="Percentage as decimal (e.g. 0.05 = 5%)"

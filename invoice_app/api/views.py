@@ -151,7 +151,7 @@ class ServiceCatalogView(ModelViewSet):
     queryset = ServiceCatalog.objects.all()
     serializer_class = ServiceCatalogSerializer
 
-    @action(detail=False, methods=['put'])
+    @action(detail=False, methods=['get','put'])
     def bulk_update(self, request):
 
         data = request.data
@@ -162,26 +162,28 @@ class ServiceCatalogView(ModelViewSet):
         with transaction.atomic():
             for index, item in enumerate(data):
                 item_id = item.get('id')
-            
-            if item_id is not None:
-                instance = ServiceCatalog.objects.filter(pk=item_id).first()
-            
-            serializer = self.get_serializer(
-                instance=instance,
-                data=item,
-                partial=False,
-            )
 
-            if serializer.is_valid():
-                obj = serializer.save()
-                saved.append(ServiceCatalogSerializer(obj).data)
-            else:
-                errors.append(
-                    {
-                        'index': index,
-                        'error': serializer.errors
-                    }
+                instance = None
+                
+                if item_id is not None:
+                    instance = ServiceCatalog.objects.filter(pk=item_id).first()
+                
+                serializer = self.get_serializer(
+                    instance=instance,
+                    data=item,
+                    partial=False,
                 )
+
+                if serializer.is_valid():
+                    obj = serializer.save()
+                    saved.append(ServiceCatalogSerializer(obj).data)
+                else:
+                    errors.append(
+                        {
+                            'index': index,
+                            'error': serializer.errors
+                        }
+                    )
             
             if errors:
                 transaction.set_rollback(True)
@@ -194,11 +196,11 @@ class ServiceCatalogView(ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             
-            return Response(
-                {
-                    'status': 'OK',
-                    'count': len(saved),
-                    'results': saved,
-                },
-                status=status.HTTP_200_OK,
-            )
+        return Response(
+            {
+                'status': 'OK',
+                'count': len(saved),
+                'results': saved,
+            },
+            status=status.HTTP_200_OK,
+        )

@@ -66,4 +66,4 @@ class InvoiceSerializer(serializers.ModelSerializer):
 class ServiceCatalogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceCatalog
-        fields = ['name', 'provision_type', 'amount_fixed', 'amount_percent']
+        fields = ['id', 'name', 'provision_type', 'amount_fixed', 'amount_percent']
