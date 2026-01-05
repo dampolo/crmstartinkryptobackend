@@ -62,8 +62,6 @@ class InvoiceView(ModelViewSet):
             provision_type=service.get("provision_type"),
             provision_fixed=service.get("provision_fixed"),
             provision_percent=service.get("provision_percent"),
-
-            amount=service.get("amount", 0),
         )
             
         if not invoice:
@@ -151,7 +149,7 @@ class ServiceCatalogView(ModelViewSet):
     queryset = ServiceCatalog.objects.all()
     serializer_class = ServiceCatalogSerializer
 
-    @action(detail=False, methods=['get','put'])
+    @action(detail=False, methods=['put'])
     def bulk_update(self, request):
 
         data = request.data

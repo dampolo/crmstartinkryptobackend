@@ -9,7 +9,7 @@ class PriceType(models.TextChoices):
 
 class ServiceCatalog(models.Model):
 
-    name = models.CharField(max_length=200)
+    service_name = models.CharField(max_length=200)
 
     provision_type = models.CharField(
         max_length=20,
@@ -18,7 +18,7 @@ class ServiceCatalog(models.Model):
     )
 
     # Fixed amount (example: 700.00 €)
-    amount_fixed = models.DecimalField(
+    provision_fixed = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         null=True,
@@ -26,7 +26,7 @@ class ServiceCatalog(models.Model):
     )
 
     # Percent amount (example: 0.05 = 5%)
-    amount_percent = models.DecimalField(
+    provision_percent = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         null=True,
@@ -145,10 +145,12 @@ class InvoiceService(models.Model):
         blank=True,
         help_text="Percentage as decimal (e.g. 0.05 = 5%)"
     )
-    # PRICE for this line item
-    amount = models.DecimalField(
+
+        # PRICE for this line item
+    provision_amount = models.DecimalField(
         max_digits=10,
-        decimal_places=2
+        decimal_places=2,
+        default=0
     )
 
     def __str__(self):
