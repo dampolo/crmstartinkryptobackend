@@ -48,15 +48,18 @@
           <tbody>
             {% for service in invoice.services.all %}
               <tr>
+                
+                {% if service.provision_fixed == null %}
                 <td>{{ service.service_name }}</td>
+                <td>{{ service.provision_percent }} %</td>
+                <td>{{ service.provision_amount }} €</td>
 
-                {% if service.provision_type == 'percent' %}
-                  <td>{{ service.provision_percent }} %</td>
                 {% else %}
-                  <td></td> {# or just omit the column #}
+                  <td>{{ service.service_name }} €</td>
+                  <td></td>
+                  <td>{{ service.provision_fixed }} €</td>
                 {% endif %}
 
-                  <td>{{ service.provision_percent }} €</td>
               </tr>
             {% endfor %}
           </tbody>

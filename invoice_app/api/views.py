@@ -62,6 +62,7 @@ class InvoiceView(ModelViewSet):
             provision_type=service.get("provision_type"),
             provision_fixed=service.get("provision_fixed"),
             provision_percent=service.get("provision_percent"),
+            provision_amount=service.get("provision_amount"),
         )
             
         if not invoice:
