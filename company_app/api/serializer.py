@@ -5,10 +5,12 @@ import re
 from datetime import datetime
 
 class CompanySerializer(serializers.ModelSerializer):
+    logo = serializers.ImageField(use_url=True)
 
     class Meta:
         model = Company
         fields = [
+            'logo',
             'name',
             'street',
             'number',
@@ -19,9 +21,16 @@ class CompanySerializer(serializers.ModelSerializer):
             'founding',
             'email',
             'bank',
-            'bank_account',
-            'swift_code'
+            'bank_account'
         ]
+    
+    def get_logo(self, company):
+        request = self.context.get('request')
+
+        if not company.logo:
+            return None
+
+        return request.build_absolute_uri(company.logo.url)
 
     def validate_postcode(self, value):
         pattern = re.compile(r'^[0-9]{4,5}$')

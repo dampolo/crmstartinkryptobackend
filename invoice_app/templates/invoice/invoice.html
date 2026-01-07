@@ -14,12 +14,12 @@
       <div class="invoice-container">
         <header class="invoice-header">
           <div class="company-info">
-            <h1>{{ company.name }}</h1>
+            <h1>{{ invoice.company_name }}</h1>
             <p>
-              {{ company.street }} {{ company.number }}<br />{{ company.postcode }} {{ companyControl.city }}
+              {{ invoice.company_street }} {{ invoice.company_number }}<br />{{ invoice.company_postcode }} {{ invoice.company_city }}
             </p>
           </div>
-          <a href="/" class="logo"><img src="{{ company.logo.url }}" width="60" height="60" alt="{{ company.name }}" /></a>
+          <img src="{{ invoice.company_logo.url }}" width="60" height="60" alt="logo" />
           <div class="invoice-info">
             <h2>RECHNUNG</h2>
             <p>Rechnung Nr.: {{ invoice.invoice_number }}</p>
@@ -79,12 +79,17 @@
         </div>
 
         <footer>
-          <p>
-            Bitte überweisen Sie den Gesamtbetrag innerhalb von 14 Tagen nach Erhalt dieser Rechnung. Zahlungen können per Banküberweisung oder in Kryptowährung erfolgen. Bei Fragen zu dieser Rechnung kontaktieren Sie uns bitte unter:
-            <a href="mailto:elisabeth@startinkrypto.de">elisabeth@startinkrypto.de</a>.
+          <p class="footer-p">
+            Bitte überweisen Sie den Gesamtbetrag innerhalb von 14 Tagen nach Erhalt dieser Rechnung. Zahlungen können per Banküberweisung oder in Kryptowährung erfolgen. 
           </p>
-          <p>BLZ: {{ company.swift_code }}</p>
-          <p>Bankverbindung: {{ company.bank_account }}, USt-Idnr: {{ company.tax_number }}</p>
+          <p class="footer-p">
+            Bei Fragen zu dieser Rechnung kontaktieren Sie uns bitte unter:
+            <span>
+              {{ invoice.company_email }}
+            </span>
+          </p>
+          <span>BLZ: {{ invoice.company_swift_code }}</span>
+          <span>Bankverbindung: {{ invoice.company_bank_account }}, USt-Idnr: {{ invoice.company_tax_number }}</span>
         </footer>
       </div>
     </section>

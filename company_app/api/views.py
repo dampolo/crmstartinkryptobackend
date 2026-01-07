@@ -9,7 +9,7 @@ class CompanyView(APIView):
         company = Company.objects.first()
         if not company:
             return Response({"message": "Company not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = CompanySerializer(company)
+        serializer = CompanySerializer(company, context={'request': request})
         return Response(serializer.data)
     
     def patch(self, request):

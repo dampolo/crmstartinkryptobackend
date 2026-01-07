@@ -108,7 +108,7 @@ class InvoiceView(ModelViewSet):
 
         # invoice = self.get_object()
         return render(request, "invoice.html", {
-            "company": company, 
+            "company": invoice, 
             'customer': customer, 
             'invoice': invoice
             })
