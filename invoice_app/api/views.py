@@ -12,6 +12,8 @@ from rest_framework import status
 from django.db import transaction
 
 # You can onyl see the list of the invoices but you cannot change the invoice
+
+
 class InvoiceView(ModelViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
@@ -29,12 +31,15 @@ class InvoiceView(ModelViewSet):
         invoice = serializer.save(user=request.user)
 
         # 3. CUSTOMER SNAPSHOT
-        customer = invoice.customer
-        invoice.customer_name = f"{customer.first_name} {customer.last_name}"
-        invoice.customer_address = (
-            f"{customer.street} {customer.number}, "
-            f"{customer.postcode} {customer.city}"
-        )
+        customer_id = data.get('customer')
+        customer = Customer.objects.get(id=customer_id)
+
+        invoice.customer_first_name = customer.first_name
+        invoice.customer_last_name = customer.last_name
+        invoice.customer_street = customer.street
+        invoice.customer_number = customer.number
+        invoice.customer_postcode = customer.postcode
+        invoice.customer_city = customer.city
 
         # 4. COMPANY SNAPSHOT
         company = Company.objects.first()
@@ -53,28 +58,28 @@ class InvoiceView(ModelViewSet):
 
         invoice.save()
 
-        # 5. CREATE INVOICE SERVICES
+       # 5. CREATE INVOICE SERVICES
         for service in services_data:
-            InvoiceService.objects.create(
-            invoice=invoice,
-            service_name=service.get("service_name"),
+                InvoiceService.objects.create(
+                    invoice=invoice,
+                    service_name=service.get("service_name"),
 
-            provision_type=service.get("provision_type"),
-            provision_fixed=service.get("provision_fixed"),
-            provision_percent=service.get("provision_percent"),
-            provision_amount=service.get("provision_amount"),
-        )
-            
+                    provision_type=service.get("provision_type"),
+                    provision_fixed=service.get("provision_fixed"),
+                    provision_percent=service.get("provision_percent"),
+                    provision_amount=service.get("provision_amount"),
+                )
+
         if not invoice:
             return Response(
-            {"error": "Invoice could not be created"},
-            status=status.HTTP_400_BAD_REQUEST
-            )       
+                {"error": "Invoice could not be created"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response(
             {"message": "Invoice created successfully", "invoice_id": invoice.id},
             status=status.HTTP_201_CREATED
-            )
+        )
 
     @action(detail=True, methods=['post'])
     def update_status(self, request, pk=None):
@@ -98,20 +103,21 @@ class InvoiceView(ModelViewSet):
             {"status": f"Payment status updated to: {new_status}"},
             status=status.HTTP_200_OK
         )
-    
+
     @action(detail=True, methods=['get'])
     def preview(self, request, pk=None):
         invoice = self.get_object()
-        
+
         company = Company.objects.first()
         customer = invoice.customer
 
         # invoice = self.get_object()
         return render(request, "invoice.html", {
-            "company": invoice, 
-            'customer': customer, 
+            "company": invoice,
+            'customer': customer,
             'invoice': invoice
-            })
+        })
+
 
 class InvoiceServiceView(ModelViewSet):
     queryset = InvoiceService.objects.all()
@@ -121,7 +127,7 @@ class InvoiceServiceView(ModelViewSet):
 def generate_invoice_number():
     """
     Generate a new sequential invoice number with the format: #000001
-    
+
     The function:
     - Extracts the numeric part from existing invoice numbers (after #')
     - Finds the highest existing number
@@ -142,9 +148,10 @@ def generate_invoice_number():
 
     # If at least one number exists, increment it; otherwise start at 1
     next_number = (last_invoice + 1) if last_invoice else 1
-    
+
     # Format result as # + 6-digit zero-padded number
     return f"#{next_number:06d}"
+
 
 class ServiceCatalogView(ModelViewSet):
     queryset = ServiceCatalog.objects.all()
@@ -163,10 +170,11 @@ class ServiceCatalogView(ModelViewSet):
                 item_id = item.get('id')
 
                 instance = None
-                
+
                 if item_id is not None:
-                    instance = ServiceCatalog.objects.filter(pk=item_id).first()
-                
+                    instance = ServiceCatalog.objects.filter(
+                        pk=item_id).first()
+
                 serializer = self.get_serializer(
                     instance=instance,
                     data=item,
@@ -183,7 +191,7 @@ class ServiceCatalogView(ModelViewSet):
                             'error': serializer.errors
                         }
                     )
-            
+
             if errors:
                 transaction.set_rollback(True)
                 return Response(
@@ -194,7 +202,7 @@ class ServiceCatalogView(ModelViewSet):
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            
+
         return Response(
             {
                 'status': 'OK',

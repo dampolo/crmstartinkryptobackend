@@ -75,8 +75,12 @@ class Invoice(models.Model):
     )
     
      # --- CUSTOMER SNAPSHOT ---
-    customer_name = models.CharField(max_length=200)
-    customer_address = models.TextField()
+    customer_first_name = models.CharField(max_length=100)
+    customer_last_name = models.CharField(max_length=100)
+    customer_street = models.CharField(max_length=200)
+    customer_number = models.CharField(max_length=10)
+    customer_postcode = models.CharField(max_length=20)
+    customer_city = models.CharField(max_length=100)
     
      # --- COMPANY SNAPSHOT ---
     company_name = models.CharField(max_length=255)

@@ -31,9 +31,9 @@
         <div class="bill-to">
           <h3>Rechnung an:</h3>
           <address>
-            <strong>{{ customer.first_name }} {{ customer.last_name }}</strong><br />
-            {{ customer.street }} {{ customer.number }}<br />
-            {{ customer.postcode }} {{ customer.city }}
+            <strong>{{ invoice.customer_first_name }} {{ invoice.customer_last_name }}</strong><br />
+            {{ invoice.customer_street }} {{ invoice.customer_number }}<br />
+            {{ invoice.customer_postcode }} {{ invoice.customer_city }}
           </address>
         </div>
 
