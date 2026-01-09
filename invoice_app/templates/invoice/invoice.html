@@ -24,7 +24,7 @@
             <h2>RECHNUNG</h2>
             <p>Rechnung Nr.: {{ invoice.invoice_number }}</p>
             <p>Kundennr.: {{ customer.customer_number }}</p>
-            <p>Date: {{ customer.created_at }}</p>
+            <p>Date: {{ invoice.created_at }}</p>
           </div>
         </header>
 
@@ -70,7 +70,7 @@
             <span>Investitions Betrag:</span> <span>{{ invoice.investitions_amount }} €</span>
           </p>
           <p>
-            <span>Provison (6.5%):</span> <span>{{ invoice.provision }} €</span>
+            <span>Provison:</span> <span>{{ invoice.provision }} €</span>
           </p>
           <p>
             <span>MwSt. (19%):</span> <span>{{ invoice.value_tax }} €</span>

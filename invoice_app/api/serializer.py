@@ -15,7 +15,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'id', 'invoice_number','invoice_type', 'invoice_status',
 
             # customer snapshot
-            'customer_name', 'customer_address',
+            'customer_first_name', 'customer_last_name', 'customer_street',
+            'customer_number', 'customer_postcode', 'customer_city',
 
             # company snapshot
             'company_name', 'company_street', 'company_number', 'company_postcode',
@@ -45,8 +46,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'pdf_file',
 
             # Customer snapshot
-            'customer_name',
-            'customer_address',
+            'customer_first_name', 'customer_last_name', 'customer_street',
+            'customer_number', 'customer_postcode', 'customer_city',
 
             # Company snapshot
             'company_name',
