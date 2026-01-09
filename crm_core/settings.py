@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'invoice_app',
     'auth_app',
     'rest_framework_simplejwt',
-    'django_extensions'
+    'django_extensions',
+    'weasyprint'
 ]
 
 MIDDLEWARE = [

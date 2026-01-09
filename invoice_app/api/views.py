@@ -10,6 +10,11 @@ from django.shortcuts import render
 from company_app.models import Company
 from rest_framework import status
 from django.db import transaction
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.conf import settings
+import os
 
 # You can onyl see the list of the invoices but you cannot change the invoice
 
@@ -111,14 +116,36 @@ class InvoiceView(ModelViewSet):
         company = Company.objects.first()
         customer = invoice.customer
 
-        # invoice = self.get_object()
-        return render(request, "invoice.html", {
-            "company": invoice,
-            'customer': customer,
-            'invoice': invoice
+        return render(request, 'invoice.html', {
+            "company": company,
+            "customer": customer,
+            "invoice": invoice
+        })
+    
+    @action(detail=True, methods=['get'])
+    def pdf(self, request, pk='None'):
+        invoice = self.get_object()
+        company = Company.objects.first()
+        customer = invoice.customer
+
+        html_string= render_to_string('invoice.html', {
+            "company": company,
+            "customer": customer,
+            "invoice": invoice
         })
 
+        html = HTML(
+            string=html_string,
+            base_url=request.build_absolute_uri()
+        )
+        
+        pdf=html.write_pdf()
+        
+        response=HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="invoice_{invoice.id}_{invoice.invoice_number}.pdf"'
 
+        return response
+    
 class InvoiceServiceView(ModelViewSet):
     queryset = InvoiceService.objects.all()
     serializer_class = InvoiceServiceSerializer
