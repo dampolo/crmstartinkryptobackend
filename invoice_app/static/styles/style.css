@@ -1,0 +1,137 @@
+@font-face {
+  font-family: "Montserrat";
+  src: url("/static/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Roboto";
+  src: url("/static/fonts/Roboto/Roboto-Italic-VariableFont_wdth,wght.ttf") format("truetype");
+}
+
+@page {
+        size: A4; /* Change from the default size of A4 */
+        margin: 10pt;
+      }
+
+body {
+    font-family: "Roboto", sans-serif;
+    font-size: 12pt; /*16px*/
+}
+
+h1, h2, h3 {
+    font-family: "Montserrat", sans-serif;
+}
+
+
+.invoice-container {
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #fff;
+  width: 535pt; /* A4 width */
+  min-height: 800pt; /* A4 height */
+  margin: auto;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1.5pt solid #f1f1f1;
+  padding-bottom: 15pt;
+  margin-bottom: 15pt;
+}
+
+address {
+  font-style: normal;
+}
+
+.logo {
+  width: 45pt;
+  height: 45pt;
+}
+
+.company-info h1 {
+  margin: 0;
+  font-size: 16pt;
+}
+
+.company-info p {
+  margin: 0;
+}
+
+.invoice-info {
+  text-align: right;
+}
+
+.invoice-info h2 {
+  color: #f4a51c;
+  margin: 0;
+  font-size: 18pt;
+}
+
+.bill-to h3 {
+  margin-bottom: 5pt;
+  color: #555;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15pt;
+}
+
+.invoice-table th {
+  text-align: left;
+  background: #fafafa;
+  padding: 7.5pt;
+  border-bottom: 1.5pt solid black;
+}
+
+.invoice-table td {
+  padding: 7.5pt;
+  border-bottom: 0.75pt solid #eee;
+}
+
+.invoice-table td:last-child,
+.invoice-table th:last-child {
+  text-align: right;
+}
+
+.totals {
+  text-align: right;
+  margin-top: 15pt;
+}
+
+.totals span:nth-of-type(2n) {
+  text-align: right;
+}
+
+.totals p,
+.totals h3 {
+  margin: 3pt 0;
+}
+
+.totals span {
+  display: inline-block;
+  width: 112.5pt;
+  text-align: left;
+}
+
+.totals h3 {
+  font-size: 14.5pt;
+  color: #f4a51c;
+  margin-top: 7.5pt;
+}
+
+footer {
+  margin-top: 22.5pt;
+  font-size: 10.5pt;
+  color: #555;
+  border-top: 0.75pt solid #eee;
+  padding-top: 12pt;
+}
+
+.footer-p {
+  margin: 0;
+}

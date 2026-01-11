@@ -19,7 +19,7 @@
               {{ invoice.company_street }} {{ invoice.company_number }}<br />{{ invoice.company_postcode }} {{ invoice.company_city }}
             </p>
           </div>
-          <img src="{{ invoice.company_logo.url }}" width="60" height="60" alt="logo" />
+          <img class="logo" src="{{ invoice.company_logo.url }}" alt="logo" />
           <div class="invoice-info">
             <h2>RECHNUNG</h2>
             <p>Rechnung Nr.: {{ invoice.invoice_number }}</p>
@@ -55,7 +55,7 @@
                 <td>{{ service.provision_amount }} €</td>
 
                 {% else %}
-                  <td>{{ service.service_name }} €</td>
+                  <td>{{ service.service_name }}</td>
                   <td></td>
                   <td>{{ service.provision_fixed }} €</td>
                 {% endif %}

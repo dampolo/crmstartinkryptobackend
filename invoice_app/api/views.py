@@ -15,6 +15,7 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.conf import settings
 import os
+from rest_framework import permissions 
 
 # You can onyl see the list of the invoices but you cannot change the invoice
 
@@ -109,7 +110,7 @@ class InvoiceView(ModelViewSet):
             status=status.HTTP_200_OK
         )
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny] )
     def preview(self, request, pk=None):
         invoice = self.get_object()
 
@@ -122,7 +123,7 @@ class InvoiceView(ModelViewSet):
             "invoice": invoice
         })
     
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny])
     def pdf(self, request, pk='None'):
         invoice = self.get_object()
         company = Company.objects.first()
