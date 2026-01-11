@@ -141,13 +141,19 @@ class InvoiceView(ModelViewSet):
         )
         
         pdf=html.write_pdf()
+
+        download = request.query_params.get('download')
+
+        disposition_type = 'attachment' if download else 'inline'
         
         response=HttpResponse(pdf, content_type='application/pdf')
+
         response['Content-Disposition'] = (
-            f'attachment; filename="invoice_{invoice.id}_{invoice.invoice_number}.pdf"'
+            f'{disposition_type}; filename="invoice_{invoice.id}_{invoice.invoice_number}.pdf"'
         )
         
         return response
+    
     
 class InvoiceServiceView(ModelViewSet):
     queryset = InvoiceService.objects.all()
