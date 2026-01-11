@@ -143,8 +143,10 @@ class InvoiceView(ModelViewSet):
         pdf=html.write_pdf()
         
         response=HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename="invoice_{invoice.id}_{invoice.invoice_number}.pdf"'
-
+        response['Content-Disposition'] = (
+            f'attachment; filename="invoice_{invoice.id}_{invoice.invoice_number}.pdf"'
+        )
+        
         return response
     
 class InvoiceServiceView(ModelViewSet):
