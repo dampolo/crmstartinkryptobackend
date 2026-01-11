@@ -141,7 +141,10 @@ class InvoiceView(ModelViewSet):
         )
         
         pdf=html.write_pdf()
-
+        
+        # check the option
+        # /api/invoices/12/pdf/?download=true ---> download the invoice automaticly
+        # /api/invoices/12/pdf/ ---> only view the invoice
         download = request.query_params.get('download')
 
         disposition_type = 'attachment' if download else 'inline'
