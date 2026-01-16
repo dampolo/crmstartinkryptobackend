@@ -9,7 +9,7 @@ class User(AbstractUser):
         APPLICANT = "applicant", _("Applicant")
 
 
-    email = models.EmailField(max_length=150, default=None)
+    email = models.EmailField(max_length=150, default=None, unique=True )
     file = models.ImageField(upload_to='uploads/', blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, default="")
     tel = models.CharField(blank=True, default="")
