@@ -86,7 +86,6 @@ class CookieTokenRefreshView(TokenRefreshView):
             httponly=True,
             secure=True,
             samesite='Lax',
-            path='/'
         )
 
         return response
