@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from auth_app.models import User
 
+from customer_app.api.serializer import generate_customer_number
+
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -27,13 +29,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        print(validated_data)
         password = validated_data['password']
         validated_data.pop('repeated_password')
+        
+        user_type = validated_data.get('type')
 
         user = User(
             email=validated_data['email'],
             username=validated_data['email'],
+            type=user_type
         )
+
+        if user_type == User.ProfileType.CUSTOMER:
+            user.customer_number = generate_customer_number()
 
         user.set_password(password)
         user.save()

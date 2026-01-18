@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from customer_app.models import Customer
+from customer_app.models import UserComment
 
-admin.site.register(Customer)
+admin.site.register(UserComment)
 
 # Register your models here.

@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from customer_app.models import Customer, CustomerComment
+from customer_app.models import UserComment
+from auth_app.models import User
+
 
 
 class CustomerCommentSerializer(serializers.ModelSerializer):
@@ -7,7 +9,7 @@ class CustomerCommentSerializer(serializers.ModelSerializer):
     text = serializers.CharField(allow_blank=True)
     
     class Meta:
-        model = CustomerComment
+        model = UserComment
         fields = ['id', 'user', 'text', 'created_at', 'updated_at']
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
@@ -21,7 +23,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     comments = CustomerCommentSerializer(many=True, required=False)
 
     class Meta:
-        model = Customer
+        model = User
         fields = [
             'id',
             'user',
@@ -58,11 +60,11 @@ class CustomerSerializer(serializers.ModelSerializer):
         comments_data = validated_data.pop('comments', [])
         validated_data['customer_number'] = generate_customer_number()
 
-        customer = Customer.objects.create(**validated_data)
+        customer = User.objects.create(**validated_data)
 
 
         for comment in comments_data:
-            CustomerComment.objects.create(
+            UserComment.objects.create(
                 customer=customer,
                 user=user,      # <-- ADD THIS
                 **comment
@@ -100,7 +102,7 @@ def generate_customer_number():
     # Annotate each customer with the numeric portion of customer_number
     # Example: "SK000123" → 123
     last_number = (
-        Customer.objects
+        User.objects
         .annotate(num=Cast(Substr('customer_number', 3), IntegerField()))
         .aggregate(max_num=Max('num'))['max_num']
     )

@@ -1,13 +1,12 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializer import InvoiceSerializer, InvoiceServiceSerializer, ServiceCatalogSerializer
 from invoice_app.models import Invoice, InvoiceService, ServiceCatalog
-from customer_app.models import Customer
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.template.response import TemplateResponse
 from rest_framework.decorators import action
 from django.shortcuts import render
 from company_app.models import Company
+from auth_app.models import User
 from rest_framework import status
 from django.db import transaction
 from django.http import HttpResponse
@@ -38,7 +37,7 @@ class InvoiceView(ModelViewSet):
 
         # 3. CUSTOMER SNAPSHOT
         customer_id = data.get('customer')
-        customer = Customer.objects.get(id=customer_id)
+        customer = User.objects.get(id=customer_id)
 
         invoice.customer_first_name = customer.first_name
         invoice.customer_last_name = customer.last_name

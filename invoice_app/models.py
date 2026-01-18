@@ -1,5 +1,6 @@
 from django.db import models
-from customer_app.models import Customer
+from auth_app.models import User
+
 from django.utils.translation import gettext_lazy as _
 from auth_app.models import User
 
@@ -62,12 +63,6 @@ class Invoice(models.Model):
         default=PaymentStatus.UNPAID
     )
 
-    customer = models.ForeignKey(
-        Customer, 
-        related_name='invoices', 
-        on_delete=models.PROTECT
-    )
-
     user = models.ForeignKey(
         User, 
         related_name='invoices', 
@@ -75,12 +70,12 @@ class Invoice(models.Model):
     )
     
      # --- CUSTOMER SNAPSHOT ---
-    customer_first_name = models.CharField(max_length=100)
-    customer_last_name = models.CharField(max_length=100)
-    customer_street = models.CharField(max_length=200)
-    customer_number = models.CharField(max_length=10)
-    customer_postcode = models.CharField(max_length=20)
-    customer_city = models.CharField(max_length=100)
+    user_first_name = models.CharField(max_length=100)
+    user_last_name = models.CharField(max_length=100)
+    user_street = models.CharField(max_length=200)
+    user_number = models.CharField(max_length=10)
+    user_postcode = models.CharField(max_length=20)
+    user_city = models.CharField(max_length=100)
     
      # --- COMPANY SNAPSHOT ---
     company_name = models.CharField(max_length=255)
@@ -94,9 +89,6 @@ class Invoice(models.Model):
     company_bank_account = models.CharField(max_length=34)
     company_swift_code = models.CharField(max_length=20)
     company_logo = models.ImageField(upload_to='invoice_company_logos/', null=True, blank=True)
-
-    # --- PDF FILE ---
-    pdf_file = models.FileField(upload_to="invoices/", null=True, blank=True)
 
     # --- STATUS INFO ---
     created_at = models.DateTimeField(auto_now_add=True)
