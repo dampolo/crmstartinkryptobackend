@@ -1,14 +1,16 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from auth_app.models import User
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 
 class RegistrationSerializer(serializers.ModelSerializer):
     repeated_password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'repeated_password']
+        fields = ['email', 'password', 'repeated_password', 'type']
         extra_kwargs = {
             'password': {
                 'write_only': True
@@ -24,31 +26,37 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Passwords do not match')
         return value
 
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError('Email already exists')
-        return value
+    def create(self, validated_data):
+        password = validated_data['password']
+        validated_data.pop('repeated_password')
 
-    def save(self):
-        pw = self.validated_data['password']
+        user = User(
+            email=validated_data['email'],
+            username=validated_data['email'],
+        )
 
-        account = User(email=self.validated_data['email'], username=self.validated_data['username'])
-        account.set_password(pw)
-        account.save()
-        return account
-    
-from django.contrib.auth import get_user_model
+        user.set_password(password)
+        user.save()
+        return user
+
 
 User = get_user_model()
-    
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if 'username' in self.fields:
+            self.fields.pop('username')
+
     def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')
-    
+
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
@@ -56,10 +64,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         if not user.check_password(password):
             raise serializers.ValidationError('Ungültige Email oder Passwort')
-        
+
         data = super().validate({
             'username': user.username,
             'password': password
         })
-        
+
         return data

@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from .serializer import RegistrationSerializer
+from .serializer import RegistrationSerializer, CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -28,35 +28,42 @@ class RegistrationView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Login
 class CookieTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+    
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        access = response.data.get('access')
-        refresh = response.data.get('refresh')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        refresh = serializer.validated_data['refresh']
+        access = serializer.validated_data['access']
+
+        response = Response({'message': 'Login erfolgreich'})
 
         response.set_cookie(
             key='access_token',
-            value=access,
+            value=str(access),
             httponly=True,
             secure=True,
             samesite='Lax',
-            path='/'
+            # path='/'
         )
 
         response.set_cookie(
             key='refresh_token',
-            value=refresh,
+            value=str(refresh),
             httponly=True,
             secure=True,
             samesite='Lax',
-            path='/'
+            # path='/'
         )
 
-        response.data = {'message': 'Du bist angemeldet'}
         return response
 
 
 class CookieTokenRefreshView(TokenRefreshView):
+
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")
 
