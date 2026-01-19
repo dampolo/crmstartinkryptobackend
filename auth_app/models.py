@@ -46,4 +46,4 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.username} and {self.first_name}"
+        return f"{self.username} {self.first_name}"

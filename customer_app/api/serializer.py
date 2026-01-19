@@ -2,8 +2,6 @@ from rest_framework import serializers
 from customer_app.models import UserComment
 from auth_app.models import User
 
-
-
 class CustomerCommentSerializer(serializers.ModelSerializer):
     # With allow_blank=True you give decision to the validation method validate_text.
     text = serializers.CharField(allow_blank=True)

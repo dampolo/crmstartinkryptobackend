@@ -5,9 +5,12 @@ from rest_framework.response import Response
 from .serializer import RegistrationSerializer, CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from auth_app.models import User
 from rest_framework.decorators import api_view, permission_classes
-
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode
+from django.core.mail import send_mail
+from django.utils.encoding import force_bytes
 
 class RegistrationView(APIView):
     permission_classes = [AllowAny]
@@ -21,7 +24,8 @@ class RegistrationView(APIView):
             data = {
                 'username': saved_account.username,
                 'email': saved_account.email,
-                'user_id': saved_account.pk
+                'user_id': saved_account.pk,
+                'customer_number': saved_account.customer_number
             }
             return Response(data)
         else:
@@ -115,3 +119,27 @@ class LogoutView(APIView):
         response.delete_cookie('refresh_token', path='/') 
         
         return response
+
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        email = request.data.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'message': 'This email do not exists, a reset link was not sent.'})
+
+        token = PasswordResetTokenGenerator().make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        reset_link = f"http://localhost:4200/reset-password/{uid}/{token}"
+
+        send_mail(
+            'Reset Your Password',
+            f'Click here to reset your password:\n{reset_link}',
+            None,
+            [email],
+        )
+
+        return Response({'message': 'Reset link sent'})
