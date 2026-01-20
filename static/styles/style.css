@@ -1,3 +1,4 @@
+
 @font-face {
   font-family: "Montserrat";
   src: url("/static/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf") format("truetype");
@@ -9,7 +10,7 @@
 }
 
 @page {
-        size: A4; /* Change from the default size of A4 */
+  size: A4; /* Change from the default size of A4 */
         margin: 10pt;
       }
 
@@ -19,7 +20,7 @@ body {
 }
 
 h1, h2, h3 {
-    font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 
@@ -135,3 +136,7 @@ footer {
 .footer-p {
   margin: 0;
 }
+
+/* @import url(./resets.css); */
+
+/* FORGOT PASSWORD */

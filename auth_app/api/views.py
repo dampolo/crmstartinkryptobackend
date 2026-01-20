@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.views import APIView
+from rest_framework.views import APIView,View
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from .serializer import RegistrationSerializer, CustomTokenObtainPairSerializer
@@ -8,9 +8,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from auth_app.models import User
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.http import urlsafe_base64_encode
-from django.core.mail import send_mail
-from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.core.mail import EmailMessage
+from django.utils.encoding import force_bytes, force_str
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.shortcuts import render
+
 
 class RegistrationView(APIView):
     permission_classes = [AllowAny]
@@ -133,13 +137,62 @@ class ForgotPasswordView(APIView):
         token = PasswordResetTokenGenerator().make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-        reset_link = f"http://localhost:4200/reset-password/{uid}/{token}"
+        reset_link = f"http://127.0.0.1:4200/reset-password/{uid}/{token}"
 
-        send_mail(
-            'Reset Your Password',
-            f'Click here to reset your password:\n{reset_link}',
-            None,
-            [email],
+        html_content = render_to_string(
+            'templates/forgot_password.html',
+            {
+                'reset_link': reset_link,
+            }
         )
 
+        email_message = EmailMessage(
+            subject='Passwort zurücksetzen',
+            body=html_content,
+            from_email=f"Start in Krypto <{settings.DEFAULT_FROM_EMAIL}>",
+            to=[email],
+        )
+
+        email_message.content_subtype = 'html'
+        email_message.send()
+
         return Response({'message': 'Reset link sent'})
+    
+# TEST
+# class ForgotPasswordEmailPreviewView(View):
+#     def get(self, request):
+#         # Dummy-Link nur für Vorschau
+#         reset_link = "http://localhost:4200/reset-password/UID/TOKEN"
+
+#         return render(
+#             request,
+#             'templates/forgot_password.html',
+#             {
+#                 'reset_link': reset_link,
+#                 # optional, falls im Template genutzt
+#                 'user': request.user if request.user.is_authenticated else None,
+#             }
+#         )
+
+
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uid = request.data.get('uid')
+        token = request.data.get('token')
+        password = request.data.get('password')
+        print('test')
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user = User.objects.get(pk=user_id)
+        except(User.DoesNotExist, ValueError, TypeError):
+            return Response({'error': "Invalid link"}, status=400)
+        
+        if not PasswordResetTokenGenerator().check_token(user, token):
+            return Response({'error': "Token is invalid or expired"}, status=400)
+        
+        user.set_password(password)
+        user.save()
+
+        return Response({'message': 'Password reset successful'})

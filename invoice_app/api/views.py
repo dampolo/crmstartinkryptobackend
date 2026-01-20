@@ -116,7 +116,7 @@ class InvoiceView(ModelViewSet):
         company = Company.objects.first()
         customer = invoice.customer
 
-        return render(request, 'invoice.html', {
+        return render(request, 'templates/invoice.html', {
             "company": company,
             "customer": customer,
             "invoice": invoice
@@ -128,7 +128,7 @@ class InvoiceView(ModelViewSet):
         company = Company.objects.first()
         customer = invoice.customer
 
-        html_string= render_to_string('invoice.html', {
+        html_string= render_to_string('templates/invoice.html', {
             "company": company,
             "customer": customer,
             "invoice": invoice

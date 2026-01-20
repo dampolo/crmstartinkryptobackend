@@ -8,5 +8,10 @@ urlpatterns = [
     path('token/refresh/', views.CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
     path('forgot-password/', views.ForgotPasswordView.as_view(), name='forgot-password'),
-    # path('reset-password/', views.ResetPasswordView.as_view()),
+    path('reset-password/', views.ResetPasswordView.as_view(), name='reset-password'),
+    # path(
+    #     'preview/forgot-password-email/',
+    #     views.ForgotPasswordEmailPreviewView.as_view(),
+    #     name='forgot_password_email_preview'
+    # ),
 ]

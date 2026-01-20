@@ -34,7 +34,8 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '34.32.2.236', 'demo.startinkrypto.de']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0',
+                 '34.32.2.236', 'demo.startinkrypto.de']
 
 # Application definition
 
@@ -106,7 +107,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / 'invoice_app/templates/invoice/'
+            BASE_DIR / 'static',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -164,7 +165,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -175,7 +175,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Additional dirs for development
 STATICFILES_DIRS = [
-    BASE_DIR / "invoice_app" / "static",  # IMPORTANT
+    BASE_DIR / "static/",  # IMPORTANT
 ]
 
 # Default primary key field type
@@ -205,15 +205,14 @@ EMAIL_HOST_PASSWORD = env("START_IN_KRYPTO")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-    'auth_app.authentication.CookieJWTAuthentication',   # FIRST!
-    'rest_framework_simplejwt.authentication.JWTAuthentication',
-    'rest_framework.authentication.SessionAuthentication',
+        'auth_app.authentication.CookieJWTAuthentication',   # FIRST!
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ]
 }
 
