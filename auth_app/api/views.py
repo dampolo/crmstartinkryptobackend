@@ -132,7 +132,7 @@ class ForgotPasswordView(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({'message': 'This email do not exists, a reset link was not sent.'})
+            return Response({'message': 'If the email exists, a reset link was sent.'})
 
         token = PasswordResetTokenGenerator().make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
