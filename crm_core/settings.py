@@ -55,7 +55,14 @@ INSTALLED_APPS = [
     'auth_app',
     'rest_framework_simplejwt',
     'django_extensions',
-    'weasyprint'
+    'weasyprint',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -67,7 +74,25 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
+
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': env('GOOGLE_CLIENT_ID'),
+            'secret': env('GOOGLE_CLIENT_SECRET'),
+            'key': ''
+        }
+    }
+}
+
+
 CSRF_TRUSTED_ORIGINS = [
 
     'http://127.0.0.1:5500',
@@ -194,15 +219,36 @@ AUTH_USER_MODEL = 'auth_app.User'
 # EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
+# This if for:
+    # -forgot password
+    # -reset password
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
 EMAIL_HOST_USER = env("EMAIL")
 EMAIL_HOST_PASSWORD = env("START_IN_KRYPTO")
-
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
+
+# ALL AUTH
+REST_AUTH_TOKEN_MODEL = None
+REST_USE_JWT = True
+LOGIN_REDIRECT_URL = "http://127.0.0.1:4200/customer/dashboard"
+LOGOUT_REDIRECT_URL = "http://127.0.0.1:4200/"
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+# No duplicate account
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+SOCIALACCOUNT_ADAPTER = "auth_app.adapters.CustomSocialAccountAdapter"
+
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+
+# Direct to Google
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
 REST_FRAMEWORK = {

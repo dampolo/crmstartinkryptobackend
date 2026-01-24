@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.views import APIView,View
+from rest_framework.views import APIView, View
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from .serializer import RegistrationSerializer, CustomTokenObtainPairSerializer
@@ -14,6 +14,10 @@ from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.shortcuts import render
+# from google.oauth2 import id_token
+# from google.auth.transport import requests
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import redirect
 
 
 class RegistrationView(APIView):
@@ -39,7 +43,7 @@ class RegistrationView(APIView):
 # Login
 class CookieTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-    
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -108,6 +112,7 @@ class CookieTokenRefreshView(TokenRefreshView):
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
         return Response({
             'id': request.user.id,
@@ -115,17 +120,20 @@ class MeView(APIView):
         })
 
 
-class LogoutView(APIView): 
+class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
-    def post(self, response): 
-        response = Response({'message': 'Logged out'}) 
-        response.delete_cookie('access_token', path='/') 
-        response.delete_cookie('refresh_token', path='/') 
-        
+
+    def post(self, response):
+        response = Response({'message': 'Logged out'})
+        response.delete_cookie('access_token', path='/')
+        response.delete_cookie('refresh_token', path='/')
+
         return response
+
 
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         email = request.data.get('email')
 
@@ -157,22 +165,6 @@ class ForgotPasswordView(APIView):
         email_message.send()
 
         return Response({'message': 'Reset link sent'})
-    
-# TEST
-# class ForgotPasswordEmailPreviewView(View):
-#     def get(self, request):
-#         # Dummy-Link nur für Vorschau
-#         reset_link = "http://localhost:4200/reset-password/UID/TOKEN"
-
-#         return render(
-#             request,
-#             'templates/forgot_password.html',
-#             {
-#                 'reset_link': reset_link,
-#                 # optional, falls im Template genutzt
-#                 'user': request.user if request.user.is_authenticated else None,
-#             }
-#         )
 
 
 class ResetPasswordView(APIView):
@@ -186,12 +178,12 @@ class ResetPasswordView(APIView):
         try:
             user_id = force_str(urlsafe_base64_decode(uid))
             user = User.objects.get(pk=user_id)
-        except(User.DoesNotExist, ValueError, TypeError):
+        except (User.DoesNotExist, ValueError, TypeError):
             return Response({'error': "Invalid link"}, status=400)
-        
+
         if not PasswordResetTokenGenerator().check_token(user, token):
             return Response({'error': "Token is invalid or expired"}, status=400)
-        
+
         user.set_password(password)
         user.save()
 
