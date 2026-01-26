@@ -239,9 +239,6 @@ LOGIN_REDIRECT_URL = "http://127.0.0.1:4200/customer/dashboard"
 LOGOUT_REDIRECT_URL = "http://127.0.0.1:4200/"
 
 # Email-based auth
-ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_SIGNUP_FIELDS = ["email"]
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 
 # No duplicate account

@@ -9,9 +9,6 @@ class CustomerView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
  # LIST + CREATE
 class CustomerCommentListCreate(ListCreateAPIView):
     serializer_class = CustomerCommentSerializer

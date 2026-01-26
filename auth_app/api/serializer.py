@@ -32,7 +32,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         print(validated_data)
         password = validated_data['password']
         validated_data.pop('repeated_password')
-        
+
         user_type = validated_data.get('type')
 
         user = User(
@@ -80,3 +80,4 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         })
 
         return data
+
