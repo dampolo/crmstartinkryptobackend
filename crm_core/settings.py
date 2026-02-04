@@ -81,9 +81,10 @@ MIDDLEWARE = [
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        # For each OAuth based provider, either add a ``SocialApp``
-        # (``socialaccount`` app) containing the required client
-        # credentials, or list them here:
+        'EMAIL_AUTHENTICATION': True,
+        'SCOPE': [
+            'email',
+        ],
         'APP': {
             'client_id': env('GOOGLE_CLIENT_ID'),
             'secret': env('GOOGLE_CLIENT_SECRET'),
@@ -91,6 +92,25 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+SITE_ID = 1
+
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Allauth core
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+LOGIN_REDIRECT_URL = "http://127.0.0.1:4200/customer/dashboard"
+LOGOUT_REDIRECT_URL = "http://127.0.0.1:4200/"
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_ADAPTER = "auth_app.adapters.CustomSocialAccountAdapter"
+
 
 
 CSRF_TRUSTED_ORIGINS = [
@@ -220,8 +240,8 @@ AUTH_USER_MODEL = 'auth_app.User'
 # DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 # This if for:
-    # -forgot password
-    # -reset password
+# -forgot password
+# -reset password
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
@@ -230,23 +250,6 @@ EMAIL_HOST_USER = env("EMAIL")
 EMAIL_HOST_PASSWORD = env("START_IN_KRYPTO")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
-
-# ALL AUTH
-REST_AUTH_TOKEN_MODEL = None
-REST_USE_JWT = True
-LOGIN_REDIRECT_URL = "http://127.0.0.1:4200/customer/dashboard"
-LOGOUT_REDIRECT_URL = "http://127.0.0.1:4200/"
-
-# Email-based auth
-ACCOUNT_UNIQUE_EMAIL = True
-
-# No duplicate account
-SOCIALACCOUNT_ADAPTER = "auth_app.adapters.CustomSocialAccountAdapter"
-SOCIALACCOUNT_QUERY_EMAIL = True
-# Direct to Google
-SOCIALACCOUNT_LOGIN_ON_GET = True
-
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -254,8 +257,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'auth_app.authentication.CookieJWTAuthentication',   # FIRST!
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
 

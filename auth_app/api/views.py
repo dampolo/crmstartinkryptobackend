@@ -18,6 +18,8 @@ from django.shortcuts import render
 # from google.auth.transport import requests
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 class RegistrationView(APIView):
@@ -116,7 +118,8 @@ class MeView(APIView):
     def get(self, request):
         return Response({
             'id': request.user.id,
-            'username': request.user.username
+            'username': request.user.username,
+            'type': request.user.type
         })
 
 
