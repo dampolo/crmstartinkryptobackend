@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     "dj_rest_auth",
     "dj_rest_auth.registration",
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'course'
 ]
 
 MIDDLEWARE = [
@@ -108,8 +109,6 @@ LOGOUT_REDIRECT_URL = "http://127.0.0.1:4200/"
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 # SOCIALACCOUNT_ADAPTER = "auth_app.adapters.CustomSocialAccountAdapter"
-
-
 
 CSRF_TRUSTED_ORIGINS = [
 
