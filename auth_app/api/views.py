@@ -20,6 +20,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.contrib.auth import logout
 
 
 class RegistrationView(APIView):
@@ -126,7 +127,9 @@ class MeView(APIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, response):
+    def post(self, request):
+        # This method logout remove sessionid as well
+        logout(request)
         response = Response({'message': 'Logged out'})
         response.delete_cookie('access_token', path='/')
         response.delete_cookie('refresh_token', path='/')

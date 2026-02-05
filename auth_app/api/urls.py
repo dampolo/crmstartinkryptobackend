@@ -7,7 +7,7 @@ urlpatterns = [
     # path("auth/registration/", include("dj_rest_auth.registration.urls")),
 
     path("auth/google/", views.GoogleLogin.as_view(), name="google_login"),
-    
+
     path('me/', views.MeView.as_view(), name='me'),
     path('create-account/', views.RegistrationView.as_view(), name='create-account'),
     path('token/', views.CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
