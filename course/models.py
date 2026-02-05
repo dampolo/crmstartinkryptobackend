@@ -16,7 +16,7 @@ class Language(models.TextChoices):
 
 class DiscountCode(models.Model):
     code = models.CharField(max_length=50, unique=True)
-    Prozentwert = models.PositiveIntegerField(help_text="Rabatt % Wert")
+    percent_value = models.PositiveIntegerField(help_text="Rabatt % Wert")
     active = models.BooleanField(default=True)
     expires_at = models.DateTimeField(null=True, blank=True)
 
@@ -29,7 +29,7 @@ class DiscountCode(models.Model):
 # -------------------------
 class Section(models.Model):
     name = models.CharField(max_length=255)
-    Preis = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(max_digits=8, decimal_places=2)
     language = models.CharField(
         max_length=10,
         choices=Language.choices,

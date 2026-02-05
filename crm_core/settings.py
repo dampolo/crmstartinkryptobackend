@@ -94,21 +94,37 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+# from allauth
 SITE_ID = 1
 
-SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+# from allauth
 
-# Allauth core
+# from allauth
 ACCOUNT_UNIQUE_EMAIL = True
-
-REST_USE_JWT = True
 
 LOGIN_REDIRECT_URL = "http://127.0.0.1:4200/customer/dashboard"
 LOGOUT_REDIRECT_URL = "http://127.0.0.1:4200/"
 
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
-# SOCIALACCOUNT_ADAPTER = "auth_app.adapters.CustomSocialAccountAdapter"
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+
+REST_AUTH = {
+    "USE_JWT": True,
+
+    "JWT_AUTH_COOKIE": "access_token",
+    "JWT_AUTH_REFRESH_COOKIE": "refresh_token",
+
+    "JWT_AUTH_HTTPONLY": True,
+    
+    # if this is Nono access-token and refresh_token will disappear
+    "JWT_AUTH_SAMESITE": "Lax",   # Angular on different origin
+    "JWT_AUTH_SECURE": True,      # True in production (HTTPS)
+}
+
+
+SOCIALACCOUNT_ADAPTER = "auth_app.adapters.CustomSocialAccountAdapter"
 
 CSRF_TRUSTED_ORIGINS = [
 
@@ -253,9 +269,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'auth_app.authentication.CookieJWTAuthentication',   # FIRST!
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'auth_app.authentication.CookieJWTAuthentication',   # FIRST!
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        "auth_app.authentication.CookieJWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ]
 }
 

@@ -191,3 +191,10 @@ class ResetPasswordView(APIView):
         user.save()
 
         return Response({'message': 'Password reset successful'})
+
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+
+@method_decorator(csrf_exempt, name="dispatch")
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
