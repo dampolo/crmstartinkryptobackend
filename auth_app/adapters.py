@@ -26,5 +26,12 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         user.customer_number = generate_customer_number()
         user.user_type = 'customer'
 
+        # Google avatar
+        # extra_data = sociallogin.account.extra_data
+        # picture = extra_data.get('picture')
+
+        # if picture and not user.image:
+            # user.image = picture
+
         user.save()
         return user

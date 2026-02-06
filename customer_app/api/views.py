@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from .serializer import CustomerSerializer, CustomerCommentSerializer
+from .serializer import CustomerSerializer, CustomerCommentSerializer, CustomerProfileSerializer
 from customer_app.models import UserComment
 from auth_app.models import User
 
@@ -9,8 +9,9 @@ class CustomerView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer
 
+# View only for Customer
 class CustomerProfileView(RetrieveUpdateAPIView):
-    serializer_class = CustomerSerializer
+    serializer_class = CustomerProfileSerializer
     def get_object(self):
         return self.request.user
 
