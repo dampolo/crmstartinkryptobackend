@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from auth_app.models import User
 
-from customer_app.api.serializer import generate_customer_number
+from customer_app.api.serializer import GenerateCustomerNumber
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -42,7 +42,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         )
 
         if user_type == User.ProfileType.CUSTOMER:
-            user.customer_number = generate_customer_number()
+            user.customer_number = GenerateCustomerNumber.generate_customer_number()
 
         user.set_password(password)
         user.save()
