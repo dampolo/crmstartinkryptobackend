@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
+
 class Language(models.TextChoices):
     DE = "de", _("Deutsch")
     PL = "pl", _("Polnisch")
@@ -32,6 +33,10 @@ class Course(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     image = models.ImageField(upload_to="courses/images/")
     order = models.PositiveIntegerField(default=0)
+    language = models.CharField(
+        max_length=10, 
+        choices=Language.choices, 
+        default=Language.DE)
     badge = models.CharField(
         max_length=50,
         blank=True,
@@ -41,11 +46,13 @@ class Course(models.Model):
 
     class Meta:
         ordering = ['order']
-    
-    def __str__(self):  
+
+    def __str__(self):
         return self.name
 
 # Short describtion of th coures in points
+
+
 class CourseFeature(models.Model):
     course = models.ForeignKey(
         Course,
@@ -55,9 +62,10 @@ class CourseFeature(models.Model):
     text = models.CharField(max_length=255)
     order = models.PositiveIntegerField(default=0)
 
+
 class Lesson(models.Model):
     course = models.ForeignKey(
-    Course, on_delete=models.CASCADE, related_name='lessons')
+        Course, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
     description = models.TextField()
 
@@ -68,7 +76,7 @@ class Lesson(models.Model):
 
     class Meta:
         ordering = ['order']
-    
+
     def __str__(self):
         return f"{self.course.name} - {self.title}"
 
@@ -78,9 +86,9 @@ class LessonPDF(models.Model):
         Lesson, on_delete=models.CASCADE, related_name='pdfs')
     file = models.FileField(upload_to='lesson_pdfs/')
     title = models.CharField(max_length=255, blank=True)
-        
+
     def __str__(self):
-            return f"PDF für {self.lesson.title}"
+        return f"PDF für {self.lesson.title}"
 
 
 # -------------------------
@@ -88,7 +96,7 @@ class LessonPDF(models.Model):
 # -------------------------
 class Purchase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                         related_name='purchases')
+                             related_name='purchases')
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name='purchases')
 
@@ -97,5 +105,6 @@ class Purchase(models.Model):
 
     price = models.DecimalField(max_digits=8, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return f"{self.user.username} kaufte {self.section.name}"
