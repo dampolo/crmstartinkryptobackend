@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
 class Language(models.TextChoices):
-    EN = "en", _("English")
     DE = "de", _("Deutsch")
     PL = "pl", _("Polnisch")
 
@@ -21,35 +20,57 @@ class DiscountCode(models.Model):
     expires_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.code} ({self.percentage}%)"
+        return f"{self.code} ({self.percent_value}%)"
 
 
 # -------------------------
 # Section
 # -------------------------
-class Section(models.Model):
+class Course(models.Model):
     name = models.CharField(max_length=255)
+    description = models.TextField(default="")
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    language = models.CharField(
-        max_length=10,
-        choices=Language.choices,
-        default=Language.DE
+    image = models.ImageField(upload_to="courses/images/")
+    order = models.PositiveIntegerField(default=0)
+    badge = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text='Example: "Most Popular", "Best Value", "New"'
     )
+
+    class Meta:
+        ordering = ['order']
+    
     def __str__(self):  
         return self.name
 
+# Short describtion of th coures in points
+class CourseFeature(models.Model):
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="features"
+    )
+    text = models.CharField(max_length=255)
+    order = models.PositiveIntegerField(default=0)
 
 class Lesson(models.Model):
-    section = models.ForeignKey(
-    Section, on_delete=models.CASCADE, related_name='lessons')
+    course = models.ForeignKey(
+    Course, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
     description = models.TextField()
 
     # oder URLField bei Verwendung von YouTube/Vimeo
     video = models.FileField(upload_to="videos/")
     description_under_video = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+    
     def __str__(self):
-        return f"{self.section.name} - {self.title}"
+        return f"{self.course.name} - {self.title}"
 
 
 class LessonPDF(models.Model):
@@ -68,8 +89,8 @@ class LessonPDF(models.Model):
 class Purchase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                          related_name='purchases')
-    section = models.ForeignKey(
-        Section, on_delete=models.CASCADE, related_name='purchases')
+    course = models.ForeignKey(
+        Course, on_delete=models.CASCADE, related_name='purchases')
 
     discount = models.ForeignKey(
         DiscountCode, on_delete=models.SET_NULL, null=True, blank=True)
