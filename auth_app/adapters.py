@@ -1,6 +1,6 @@
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.contrib.auth import get_user_model
-from customer_app.api.serializer import generate_customer_number
+from customer_app.api.serializer import GenerateCustomerNumber
 
 User = get_user_model()
 
@@ -23,7 +23,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         user = super().save_user(request, sociallogin, form)
 
         # First-time Google signup logic
-        user.customer_number = generate_customer_number()
+        user.customer_number = GenerateCustomerNumber.generate_customer_number()
         user.user_type = 'customer'
 
         # Google avatar

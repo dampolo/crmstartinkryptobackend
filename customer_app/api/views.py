@@ -12,6 +12,7 @@ class CustomerView(ModelViewSet):
 # View only for Customer
 class CustomerProfileView(RetrieveUpdateAPIView):
     serializer_class = CustomerProfileSerializer
+    # Customer can see only his profile
     def get_object(self):
         return self.request.user
 
