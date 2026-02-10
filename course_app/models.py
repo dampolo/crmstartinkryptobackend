@@ -31,8 +31,8 @@ class Course(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(default="")
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    image = models.ImageField(upload_to="courses/images/")
-    order = models.PositiveIntegerField(default=0)
+    image = models.ImageField(upload_to="media/courses/",null=True,blank=True )
+    order = models.DecimalField(max_digits=4, decimal_places=2, null=False, blank=False, default=0)
     language = models.CharField(
         max_length=10, 
         choices=Language.choices, 
@@ -60,9 +60,11 @@ class CourseFeature(models.Model):
         related_name="features"
     )
     text = models.CharField(max_length=255)
-    order = models.PositiveIntegerField(default=0)
+    order = models.DecimalField(max_digits=4, decimal_places=2, null=False, blank=False, default=0)
 
-
+    class Meta:
+        ordering = ['order']
+    
 class Lesson(models.Model):
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name='lessons')
@@ -72,7 +74,8 @@ class Lesson(models.Model):
     # oder URLField bei Verwendung von YouTube/Vimeo
     video = models.FileField(upload_to="videos/")
     description_under_video = models.TextField(blank=True)
-    order = models.PositiveIntegerField(default=0)
+    order = models.DecimalField(max_digits=4, decimal_places=2, null=False, blank=False, default=0)
+    
 
     class Meta:
         ordering = ['order']

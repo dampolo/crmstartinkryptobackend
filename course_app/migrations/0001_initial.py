@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', models.FileField(upload_to='lesson_pdfs/')),
                 ('title', models.CharField(blank=True, max_length=255)),
-                ('lesson', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='pdfs', to='course.lesson')),
+                ('lesson', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='pdfs', to='course_app.lesson')),
             ],
         ),
         migrations.CreateModel(
@@ -58,14 +58,14 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('price', models.DecimalField(decimal_places=2, max_digits=8)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('discount', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='course.discountcode')),
+                ('discount', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='course_app.discountcode')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='purchases', to=settings.AUTH_USER_MODEL)),
-                ('section', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='purchases', to='course.section')),
+                ('section', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='purchases', to='course_app.section')),
             ],
         ),
         migrations.AddField(
             model_name='lesson',
             name='section',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lessons', to='course.section'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lessons', to='course_app.section'),
         ),
     ]
