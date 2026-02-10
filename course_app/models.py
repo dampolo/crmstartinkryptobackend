@@ -2,12 +2,15 @@ from django.db import models
 from auth_app.models import User
 from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
+
+class Status(models.TextChoices):
+    DRAFT = "draft", _("Draft")
+    PUBLISHED = "published", _("Published")
 
 
 class Language(models.TextChoices):
-    DE = "de", _("Deutsch")
-    PL = "pl", _("Polnisch")
+    DE = "Deutsch", _("Deutsch")
+    PL = "Polnisch", _("Polnisch")
 
 
 # -------------------------
@@ -23,7 +26,6 @@ class DiscountCode(models.Model):
     def __str__(self):
         return f"{self.code} ({self.percent_value}%)"
 
-
 # -------------------------
 # Section
 # -------------------------
@@ -31,7 +33,7 @@ class Course(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(default="")
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    image = models.ImageField(upload_to="media/courses/",null=True,blank=True )
+    image = models.ImageField(upload_to="media/lessons/",null=True,blank=True )
     order = models.DecimalField(max_digits=4, decimal_places=2, null=False, blank=False, default=0)
     language = models.CharField(
         max_length=10, 
@@ -42,6 +44,12 @@ class Course(models.Model):
         blank=True,
         null=True,
         help_text='Example: "Most Popular", "Best Value", "New"'
+    )
+    
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.DRAFT
     )
 
     class Meta:
@@ -72,10 +80,15 @@ class Lesson(models.Model):
     description = models.TextField()
 
     # oder URLField bei Verwendung von YouTube/Vimeo
-    video = models.FileField(upload_to="videos/")
+    video = models.FileField(upload_to="media/videos/",  null=True, blank=True)
     description_under_video = models.TextField(blank=True)
     order = models.DecimalField(max_digits=4, decimal_places=2, null=False, blank=False, default=0)
     
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.DRAFT
+    )
 
     class Meta:
         ordering = ['order']
@@ -110,4 +123,4 @@ class Purchase(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} kaufte {self.section.name}"
+        return f"{self.user.username} kaufte {self.course.name}"
