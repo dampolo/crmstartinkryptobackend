@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 
 class CompanySerializer(serializers.ModelSerializer):
-    logo = serializers.ImageField(use_url=True)
+    # logo = serializers.ImageField(use_url=True)
 
     class Meta:
         model = Company
@@ -21,7 +21,8 @@ class CompanySerializer(serializers.ModelSerializer):
             'founding',
             'email',
             'bank',
-            'bank_account'
+            'bank_account',
+            'swift_code',
         ]
     
     def get_logo(self, company):

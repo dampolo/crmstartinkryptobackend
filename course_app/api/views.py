@@ -10,13 +10,20 @@ from decimal import Decimal
 from django.db.models import Count
 from django.utils import timezone
 from decimal import ROUND_HALF_UP
+from django.db import transaction
+from company_app.models import Company
+from invoice_app.models import Invoice
+from invoice_app.invoice_number import GenerateInvoiceNumber
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.http import HttpResponse
 
 # You can see all courses which you can buy
-# YOu can create, update change the course
+# Admin can create, update change the course
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [AllowAny]
 
 # You can see all features from course, belong to CourseViewSet
 class CourseFeatureViewSet(viewsets.ModelViewSet):
@@ -44,7 +51,11 @@ class LessonViewSet(viewsets.ModelViewSet):
         return Lesson.objects.filter(
             course_id=course_id,
         ).order_by("order")
+    
 
+
+
+# BUY BUY
 # If you bought the course, you will see it
 class PurchasedViewSet(viewsets.ModelViewSet):
     serializer_class = PurchasedSerializer
@@ -80,6 +91,7 @@ class PurchasedViewSet(viewsets.ModelViewSet):
             user=user,
             price=price
         )
+
 
 class DiscountCodeViewSet(viewsets.ModelViewSet):
     queryset = DiscountCode.objects.all()

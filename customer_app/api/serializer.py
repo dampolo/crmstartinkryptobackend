@@ -52,8 +52,8 @@ class CustomerSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        request = self.context['request']   # <-- get request here
-        user = request.user                 # <-- authenticated user
+        request = self.context['request']
+        user = request.user           
         
         comments_data = validated_data.pop('comments', [])
         validated_data['customer_number'] = GenerateCustomerNumber.generate_customer_number()
@@ -64,7 +64,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         for comment in comments_data:
             UserComment.objects.create(
                 customer=customer,
-                user=user,      # <-- ADD THIS
+                user=user,
                 **comment
             )
         return customer

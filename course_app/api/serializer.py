@@ -64,6 +64,7 @@ class PurchasedSerializer(serializers.ModelSerializer):
     course = PurchasedCourseSerializer(read_only=True)
 
     # WRITE
+    # get id from Course
     course_id = serializers.PrimaryKeyRelatedField(
         queryset=Course.objects.all(),
         source="course",

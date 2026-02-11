@@ -4,9 +4,11 @@ from auth_app.models import User
 from django.utils.translation import gettext_lazy as _
 from auth_app.models import User
 
+
 class PriceType(models.TextChoices):
     FIXED = 'fixed', _('Fixed Amount (€)')
     PERCENT = 'percent', _('Percentage (%)')
+
 
 class ServiceCatalog(models.Model):
 
@@ -38,6 +40,7 @@ class ServiceCatalog(models.Model):
     def __str__(self):
         return f"{self.name} ({self.price_type})"
 
+
 class Invoice(models.Model):
     class InvoiceType(models.TextChoices):
         INVOICE = 'invoice', _('Invoice')
@@ -56,7 +59,7 @@ class Invoice(models.Model):
         choices=InvoiceType.choices,
         default=InvoiceType.INVOICE
     )
-    
+
     invoice_status = models.CharField(
         max_length=20,
         choices=PaymentStatus.choices,
@@ -64,20 +67,22 @@ class Invoice(models.Model):
     )
 
     user = models.ForeignKey(
-        User, 
-        related_name='invoices', 
+        User,
+        related_name='invoices',
         on_delete=models.PROTECT
     )
-    
-     # --- CUSTOMER SNAPSHOT ---
-    user_first_name = models.CharField(max_length=100)
-    user_last_name = models.CharField(max_length=100)
-    user_street = models.CharField(max_length=200)
-    user_number = models.CharField(max_length=10)
-    user_postcode = models.CharField(max_length=20)
-    user_city = models.CharField(max_length=100)
-    
-     # --- COMPANY SNAPSHOT ---
+
+    # --- CUSTOMER SNAPSHOT ---
+    user_customer_id = models.IntegerField()
+    user_customer_number = models.CharField(max_length=10)
+    user_customer_first_name = models.CharField(max_length=100)
+    user_customer_last_name = models.CharField(max_length=100)
+    user_customer_street = models.CharField(max_length=200)
+    user_customer_street_number = models.CharField(max_length=10)
+    user_customer_postcode = models.CharField(max_length=20)
+    user_customer_city = models.CharField(max_length=100)
+
+    # --- COMPANY SNAPSHOT ---
     company_name = models.CharField(max_length=255)
     company_street = models.CharField(max_length=255)
     company_number = models.CharField(max_length=20)
@@ -88,7 +93,8 @@ class Invoice(models.Model):
     company_bank = models.CharField(max_length=100)
     company_bank_account = models.CharField(max_length=34)
     company_swift_code = models.CharField(max_length=20)
-    company_logo = models.ImageField(upload_to='invoice_company_logos/', null=True, blank=True)
+    company_logo = models.ImageField(
+        upload_to='invoice_company_logos/', null=True, blank=True)
 
     # --- STATUS INFO ---
     created_at = models.DateTimeField(auto_now_add=True)
@@ -100,10 +106,11 @@ class Invoice(models.Model):
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     investitions_amount = models.DecimalField(decimal_places=2, max_digits=10)
     value_tax = models.DecimalField(decimal_places=2, max_digits=10)
-    
+
     def __str__(self):
         return f"Invoice {self.invoice_number}"
-    
+
+
 class InvoiceService(models.Model):
     invoice = models.ForeignKey(
         Invoice,
@@ -125,7 +132,7 @@ class InvoiceService(models.Model):
         default=PriceType.FIXED
     )
 
-     # If FIXED → this field is used
+    # If FIXED → this field is used
     provision_fixed = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -142,7 +149,7 @@ class InvoiceService(models.Model):
         help_text="Percentage as decimal (e.g. 0.05 = 5%)"
     )
 
-        # PRICE for this line item
+    # PRICE for this line item
     provision_amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
