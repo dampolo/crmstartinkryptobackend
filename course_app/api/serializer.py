@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from auth_app.models import User
-from course_app.models import Course, CourseFeature, Lesson, Purchase
+from course_app.models import Course, CourseFeature, Lesson, Purchase, DiscountCode
+from django.utils import timezone
 
 class CourseFeatureSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,3 +76,23 @@ class PurchaseSerializer(serializers.ModelSerializer):
             'created_at',
         ]
         read_only_fields = ['price', 'created_at']
+
+class DiscountCodeSerializer(serializers.ModelSerializer):
+    is_valid = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DiscountCode
+        fields = [
+            "id",
+            "code",
+            "percent_value",
+            "active",
+            "expires_at",
+            "is_valid",
+        ]
+    def get_is_valid(self, obj):
+        if not obj.active:
+            return False
+        if obj.expires_at and obj.expires_at < timezone.now():
+            return False
+        return True

@@ -1,11 +1,14 @@
 from rest_framework import status
 from rest_framework import viewsets
-from course_app.models import Course, CourseFeature, Lesson, Purchase
-from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchaseSerializer
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from course_app.models import Course, CourseFeature, Lesson, Purchase, DiscountCode
+from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchaseSerializer, DiscountCodeSerializer
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from decimal import Decimal
 from django.db.models import Count
+from django.utils import timezone
 from decimal import ROUND_HALF_UP
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -70,4 +73,35 @@ class PurchaseViewSet(viewsets.ModelViewSet):
         serializer.save(
             user=user,
             price=price
+        )
+
+class DiscountCodeViewSet(viewsets.ModelViewSet):
+    queryset = DiscountCode.objects.all()
+    serializer_class = DiscountCodeSerializer
+    permission_classes = [IsAdminUser]
+
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
+    def validate_code(self, request):
+        
+        code = request.data.get("code")
+        try:
+            discount = DiscountCode.objects.get(code=code, active=True)
+        except DiscountCode.DoesNotExist:
+            return Response(
+                {"detail": "Invalid discount code."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # If the code has an expiration date AND that date is already in the past
+        if discount.expires_at and discount.expires_at < timezone.now():
+            return Response(
+                {"detail": "Discount code expired."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(
+            {
+                "code": discount.code,
+                "percent_value": discount.percent_value,
+                "valid": True
+            }
         )
