@@ -3,11 +3,14 @@ from auth_app.models import User
 from course_app.models import Course, CourseFeature, Lesson, Purchase, DiscountCode
 from django.utils import timezone
 
+# You can see all features from course, belong to CourseSerializer
 class CourseFeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseFeature
         fields = ['id', 'course', 'text', 'order']
 
+
+# You can see all courses(not bought)
 class CourseSerializer(serializers.ModelSerializer):
     features = CourseFeatureSerializer(many=True, read_only=True)
 
@@ -26,6 +29,7 @@ class CourseSerializer(serializers.ModelSerializer):
             'status',
         ]
 
+# If you bought course you can see all leassons from courses
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
@@ -40,7 +44,7 @@ class LessonSerializer(serializers.ModelSerializer):
             'status',
         ]
 
-
+# Belong to PurchasedSerializer 'course'
 class PurchasedCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
@@ -53,7 +57,8 @@ class PurchasedCourseSerializer(serializers.ModelSerializer):
             'language',
         ]
 
-class PurchaseSerializer(serializers.ModelSerializer):
+# Show all courses which you bought
+class PurchasedSerializer(serializers.ModelSerializer):
     lessons_count = serializers.IntegerField(read_only=True)
     # READ
     course = PurchasedCourseSerializer(read_only=True)
@@ -78,6 +83,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
         read_only_fields = ['price', 'created_at']
 
 class DiscountCodeSerializer(serializers.ModelSerializer):
+    # is_valid exists only in the API response
     is_valid = serializers.SerializerMethodField()
 
     class Meta:
@@ -90,6 +96,7 @@ class DiscountCodeSerializer(serializers.ModelSerializer):
             "expires_at",
             "is_valid",
         ]
+
     def get_is_valid(self, obj):
         if not obj.active:
             return False

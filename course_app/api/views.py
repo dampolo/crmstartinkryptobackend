@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from course_app.models import Course, CourseFeature, Lesson, Purchase, DiscountCode
-from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchaseSerializer, DiscountCodeSerializer
+from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from decimal import Decimal
@@ -11,11 +11,14 @@ from django.db.models import Count
 from django.utils import timezone
 from decimal import ROUND_HALF_UP
 
+# You can see all courses which you can buy
+# YOu can create, update change the course
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
+# You can see all features from course, belong to CourseViewSet
 class CourseFeatureViewSet(viewsets.ModelViewSet):
     queryset = CourseFeature.objects.all()
     serializer_class = CourseFeatureSerializer
@@ -42,10 +45,12 @@ class LessonViewSet(viewsets.ModelViewSet):
             course_id=course_id,
         ).order_by("order")
 
-class PurchaseViewSet(viewsets.ModelViewSet):
-    serializer_class = PurchaseSerializer
+# If you bought the course, you will see it
+class PurchasedViewSet(viewsets.ModelViewSet):
+    serializer_class = PurchasedSerializer
     permission_classes = [IsAuthenticated]
 
+    # show you all courses which you bought
     def get_queryset(self):
         return (
                 Purchase.objects
@@ -53,6 +58,7 @@ class PurchaseViewSet(viewsets.ModelViewSet):
                 .annotate(lessons_count=Count('course__lessons'))
         )
 
+    # with this method you can buy a course
     def perform_create(self, serializer):
         user = self.request.user
         course = serializer.validated_data['course']
