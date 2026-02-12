@@ -13,7 +13,7 @@ class InvoiceServiceSerializer(serializers.ModelSerializer):
 
 
 class InvoiceSerializer(serializers.ModelSerializer):
-    services = InvoiceServiceSerializer(many=True, read_only=True)
+    services = InvoiceServiceSerializer(many=True,)
     customer = serializers.IntegerField(write_only=True)
 
     class Meta:
@@ -47,8 +47,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
         # Read-only fields: CANNOT be set by frontend
         read_only_fields = [
             'id',
-            'business',                 
-            'invoice_status',  
+            'business',
+            'invoice_status',
             'invoice_number',
             'created_at',
             'updated_at',
@@ -79,28 +79,32 @@ class InvoiceSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context['request']
-        current_user = request.user # BUSINESS
+        current_user = request.user  # BUSINESS
+
+        services_data = validated_data.pop('services', [])
 
         customer_id = validated_data.pop('customer')
         customer = User.objects.get(id=customer_id)
 
         if current_user.type != User.ProfileType.BUSINESS:
-            raise serializers.ValidationError("Only business users can create invoices.")
+            raise serializers.ValidationError(
+                "Only business users can create invoices.")
 
         company = Company.objects.first()
 
-        invoice = Invoice(
+        invoice = Invoice.objects.create(
             **validated_data,
             business=current_user,
             customer=customer,
             invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
 
             # CUSTOMER SNAPSHOT
-            user_customer_id=customer_id,
+            user_customer_id=customer.id,
+            user_customer_number=customer.customer_number,
             user_customer_first_name=customer.first_name,
             user_customer_last_name=customer.last_name,
             user_customer_street=customer.street,
-            user_customer_number=customer.number,
+            user_customer_street_number=customer.number,
             user_customer_postcode=customer.postcode,
             user_customer_city=customer.city,
 
@@ -118,7 +122,12 @@ class InvoiceSerializer(serializers.ModelSerializer):
             company_logo=company.logo,
         )
 
-        invoice.save()
+        for service_data in services_data:
+            InvoiceService.objects.create(
+                invoice=invoice,
+                **service_data
+            )
+
         return invoice
 
 

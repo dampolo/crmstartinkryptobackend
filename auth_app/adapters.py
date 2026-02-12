@@ -1,6 +1,6 @@
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.contrib.auth import get_user_model
-from customer_app.api.serializer import GenerateCustomerNumber
+from customer_app.customer_nummer import GenerateCustomerNumber
 
 User = get_user_model()
 

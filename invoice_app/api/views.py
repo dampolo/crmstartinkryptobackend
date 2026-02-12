@@ -49,19 +49,57 @@ class InvoiceView(ModelViewSet):
     @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny] )
     def preview(self, request, pk=None):
         invoice = self.get_object()
-        company = Company.objects.first()
 
         return render(request, 'templates/invoice.html', {
-            "company": company,
             "invoice": invoice
         })
-    
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny] )
+    def preview_course(self, request, pk=None):
+        invoice = self.get_object()
+
+        return render(request, 'templates/invoice_course.html', {
+            "invoice": invoice
+        })
+
+
     @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny])
     def pdf(self, request, pk='None'):
         invoice = self.get_object()
-        company = Company.objects.first()
 
         html_string= render_to_string('templates/invoice.html', {
+            "invoice": invoice
+        })
+
+        html = HTML(
+            string=html_string,
+            base_url=request.build_absolute_uri()
+        )
+        
+        pdf=html.write_pdf()
+        
+        # check the option
+        # /api/invoices/12/pdf/?download=true ---> download the invoice automaticly
+        # /api/invoices/12/pdf/ ---> only view the invoice
+        download = request.query_params.get('download')
+
+        disposition_type = 'attachment' if download else 'inline'
+        
+        response=HttpResponse(pdf, content_type='application/pdf')
+
+        response['Content-Disposition'] = (
+            f'{disposition_type}; filename="invoice_{invoice.id}_{invoice.invoice_number}.pdf"'
+        )
+        
+        return response
+    
+    # PDF - COURSE
+    @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny])
+    def pdf_course(self, request, pk='None'):
+        invoice = self.get_object()
+        company = Company.objects.first()
+
+        html_string= render_to_string('templates/invoice_course.html', {
             "company": company,
             "invoice": invoice
         })

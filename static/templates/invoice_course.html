@@ -1,6 +1,5 @@
 {% load static %}
 
-
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -24,7 +23,7 @@
             <h2>RECHNUNG</h2>
             <p>Rechnung Nr.: {{ invoice.invoice_number }}</p>
             <p>Kundennr.: {{ invoice.user_customer_number }}</p>
-            <p>Date: {{ invoice.created_at|date:"d.m.Y" }}</p>
+            <p>Date: {{ invoice.created_at|date:'d.m.Y' }}</p>
           </div>
         </header>
 
@@ -48,18 +47,15 @@
           <tbody>
             {% for service in invoice.services.all %}
               <tr>
-                
                 {% if service.provision_fixed == null %}
-                <td>{{ service.service_name }}</td>
-                <td>{{ service.provision_percent }} %</td>
-                <td>{{ service.provision_amount }} €</td>
-
+                  <td>{{ service.service_name }}</td>
+                  <td>{{ service.provision_percent }} %</td>
+                  <td>{{ service.provision_amount }} €</td>
                 {% else %}
                   <td>{{ service.service_name }}</td>
                   <td></td>
                   <td>{{ service.provision_fixed }} €</td>
                 {% endif %}
-
               </tr>
             {% endfor %}
           </tbody>
@@ -67,10 +63,7 @@
 
         <div class="totals">
           <p>
-            <span>Investitions Betrag:</span> <span>{{ invoice.investitions_amount }} €</span>
-          </p>
-          <p>
-            <span>Provison:</span> <span>{{ invoice.provision }} €</span>
+            <span>Betrag:</span> <span>{{ invoice.investitions_amount }} €</span>
           </p>
           <p>
             <span>MwSt. (19%):</span> <span>{{ invoice.value_tax }} €</span>
@@ -79,14 +72,10 @@
         </div>
 
         <footer>
-          <p class="footer-p">
-            Bitte überweisen Sie den Gesamtbetrag innerhalb von 14 Tagen nach Erhalt dieser Rechnung. Zahlungen können per Banküberweisung oder in Kryptowährung erfolgen. 
-          </p>
+          <p class="footer-p">Bitte überweisen Sie den Gesamtbetrag innerhalb von 14 Tagen nach Erhalt dieser Rechnung. Zahlungen können per Banküberweisung oder in Kryptowährung erfolgen.</p>
           <p class="footer-p">
             Bei Fragen zu dieser Rechnung kontaktieren Sie uns bitte unter:
-            <span>
-              {{ invoice.company_email }}
-            </span>
+            <span>{{ invoice.company_email }}</span>
           </p>
           <span>BLZ: {{ invoice.company_swift_code }}</span>
           <span>Bankverbindung: {{ invoice.company_bank_account }}, USt-Idnr: {{ invoice.company_tax_number }}</span>

@@ -1,6 +1,7 @@
 from django.db import models
 from auth_app.models import User
 from django.utils.translation import gettext_lazy as _
+from invoice_app.models import Invoice
 
 
 class Status(models.TextChoices):
@@ -29,15 +30,19 @@ class DiscountCode(models.Model):
 # -------------------------
 # Section
 # -------------------------
+
+
 class Course(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(default="")
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    image = models.ImageField(upload_to="media/lessons/",null=True,blank=True )
-    order = models.DecimalField(max_digits=4, decimal_places=2, null=False, blank=False, default=0)
+    image = models.ImageField(
+        upload_to="media/lessons/", null=True, blank=True)
+    order = models.DecimalField(
+        max_digits=4, decimal_places=2, null=False, blank=False, default=0)
     language = models.CharField(
-        max_length=10, 
-        choices=Language.choices, 
+        max_length=10,
+        choices=Language.choices,
         default=Language.DE)
     badge = models.CharField(
         max_length=50,
@@ -45,7 +50,7 @@ class Course(models.Model):
         null=True,
         help_text='Example: "Most Popular", "Best Value", "New"'
     )
-    
+
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
@@ -68,11 +73,13 @@ class CourseFeature(models.Model):
         related_name="features"
     )
     text = models.CharField(max_length=255)
-    order = models.DecimalField(max_digits=4, decimal_places=2, null=False, blank=False, default=0)
+    order = models.DecimalField(
+        max_digits=4, decimal_places=2, null=False, blank=False, default=0)
 
     class Meta:
         ordering = ['order']
-    
+
+
 class Lesson(models.Model):
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name='lessons')
@@ -82,8 +89,9 @@ class Lesson(models.Model):
     # oder URLField bei Verwendung von YouTube/Vimeo
     video = models.FileField(upload_to="media/videos/",  null=True, blank=True)
     description_under_video = models.TextField(blank=True)
-    order = models.DecimalField(max_digits=4, decimal_places=2, null=False, blank=False, default=0)
-    
+    order = models.DecimalField(
+        max_digits=4, decimal_places=2, null=False, blank=False, default=0)
+
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
@@ -111,8 +119,21 @@ class LessonPDF(models.Model):
 # Buy
 # -------------------------
 class Purchase(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name='purchases')
+    invoice = models.OneToOneField(
+        Invoice,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='purchase'
+    )
+    
+    customer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='purchases',
+        limit_choices_to={'type': User.ProfileType.CUSTOMER}
+    )
+
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name='purchases')
 
@@ -123,4 +144,4 @@ class Purchase(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} kaufte {self.course.name}"
+        return f"{self.customer.username} kaufte {self.course.name}"
