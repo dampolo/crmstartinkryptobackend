@@ -92,6 +92,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
         invoice = Invoice(
             **validated_data,
             business=current_user,
+            customer=customer,
             invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
 
             # CUSTOMER SNAPSHOT
