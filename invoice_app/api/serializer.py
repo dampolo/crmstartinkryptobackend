@@ -36,7 +36,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'provision', 'amount', 'investitions_amount', 'value_tax',
 
             # relations
-            'customer', 'user',
+            'customer', 'business',
 
             # system fields
             'created_at', 'updated_at', 'is_finalized',
@@ -47,8 +47,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
         # Read-only fields: CANNOT be set by frontend
         read_only_fields = [
             'id',
-            'user',                     # filled from request.user
-            'invoice_status',           # default = unpaid
+            'business',                 
+            'invoice_status',  
             'invoice_number',
             'created_at',
             'updated_at',
@@ -72,21 +72,26 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'company_bank_account',
             'company_swift_code',
             'company_logo',
+
+            # Services
             'services',
         ]
 
     def create(self, validated_data):
         request = self.context['request']
-        current_user = request.user
+        current_user = request.user # BUSINESS
 
         customer_id = validated_data.pop('customer')
         customer = User.objects.get(id=customer_id)
+
+        if current_user.type != User.ProfileType.BUSINESS:
+            raise serializers.ValidationError("Only business users can create invoices.")
 
         company = Company.objects.first()
 
         invoice = Invoice(
             **validated_data,
-            user=current_user,
+            business=current_user,
             invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
 
             # CUSTOMER SNAPSHOT

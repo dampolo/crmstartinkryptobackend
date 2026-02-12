@@ -60,11 +60,10 @@ class InvoiceView(ModelViewSet):
     def pdf(self, request, pk='None'):
         invoice = self.get_object()
         company = Company.objects.first()
-        customer = invoice.customer
 
         html_string= render_to_string('templates/invoice.html', {
             "company": company,
-            "customer": customer,
+            "invoice": invoice
         })
 
         html = HTML(

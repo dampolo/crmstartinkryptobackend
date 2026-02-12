@@ -66,10 +66,20 @@ class Invoice(models.Model):
         default=PaymentStatus.UNPAID
     )
 
-    user = models.ForeignKey(
+    # create the invocie
+    business = models.ForeignKey(
         User,
-        related_name='invoices',
-        on_delete=models.PROTECT
+        related_name="issued_invoices",
+        on_delete=models.PROTECT,
+        limit_choices_to={'type': User.ProfileType.BUSINESS}
+    )
+
+    # Receive the invoice
+    customer = models.ForeignKey(
+        User,
+        related_name="received_invoices",
+        on_delete=models.PROTECT,
+        limit_choices_to={'type': User.ProfileType.CUSTOMER}
     )
 
     # --- CUSTOMER SNAPSHOT ---
