@@ -18,6 +18,8 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.http import HttpResponse
 from auth_app.models import User
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 
 # You can see all courses which you can buy
 # Admin can create, update change the course
@@ -151,13 +153,8 @@ class PurchasedViewSet(viewsets.ModelViewSet):
             purchase.invoice = invoice
             purchase.save()
 
-    @action(detail=True, methods=['get'])
-    def create_pdf(self, request, pk=None):
-        purchase = self.get_object()
-        invoice = purchase.invoice
-
-        pdf_service = CreateInvoicePDF()
-        return pdf_service.create_invoice(request, invoice)
+        email_service = SendInvoiceEmail()
+        email_service.send_invoice_email(self.request, invoice)
 
 
 class DiscountCodeViewSet(viewsets.ModelViewSet):
@@ -196,9 +193,11 @@ class CreateCourseInvoice:
     def creat_course_invoice():
         pass
 
-# Create and download the invoice as PDF
+# Create only pdf
+
+
 class CreateInvoicePDF:
-    def create_invoice(self, request, invoice):
+    def create_pdf(self, request, invoice):
         html_string = render_to_string('templates/invoice_course.html', {
             "invoice": invoice
         })
@@ -212,9 +211,38 @@ class CreateInvoicePDF:
         # write_pdf belong to weasyprint
         pdf = html.write_pdf()
 
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = (
-            f'attachment; filename="invoice_{invoice.id}_{invoice.invoice_number}.pdf"'
+        return pdf
+
+
+class SendInvoiceEmail:
+    def send_invoice_email(self, request, invoice):
+        from django.core.mail import EmailMessage
+        from django.conf import settings
+
+        customer = invoice.customer
+
+        pdf_service = CreateInvoicePDF()
+        pdf_file = pdf_service.create_pdf(request, invoice)
+
+        # Build email
+        body = {
+                "first_name": customer.first_name,
+            }
+
+        html_answer = render_to_string("templates/email_with_invoice.html", body)
+        confirmation_message = EmailMessage(
+            subject=f"Deine Rechnung {invoice.invoice_number}",
+            body=html_answer,
+            from_email=f"Start in Krypto <{settings.DEFAULT_FROM_EMAIL}>",
+            to=[customer.email],
+            reply_to=[settings.DEFAULT_FROM_EMAIL],
         )
 
-        return response
+        confirmation_message.attach(
+            f"invoice_{invoice.invoice_number}.pdf",
+            pdf_file,
+            "application/pdf"
+        )
+
+        confirmation_message.content_subtype = "html"
+        confirmation_message.send()
