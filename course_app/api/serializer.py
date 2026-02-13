@@ -73,7 +73,7 @@ class PurchasedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Purchase
         fields = [
-            'id',
+            'id', # id from purchased
             'course',
             "course_id",
             'lessons_count',

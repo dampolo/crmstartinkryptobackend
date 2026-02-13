@@ -18,7 +18,7 @@
               {{ invoice.company_street }} {{ invoice.company_number }}<br />{{ invoice.company_postcode }} {{ invoice.company_city }}
             </p>
           </div>
-          {% comment %} <img class="logo" src="{{ invoice.company_logo.url }}" alt="logo" /> {% endcomment %}
+          <img class="logo" src="{{ invoice.company_logo.url }}" alt="logo" />
           <div class="invoice-info">
             <h2>RECHNUNG</h2>
             <p>Rechnung Nr.: {{ invoice.invoice_number }}</p>

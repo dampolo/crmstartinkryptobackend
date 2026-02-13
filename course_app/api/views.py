@@ -44,8 +44,9 @@ class LessonViewSet(viewsets.ModelViewSet):
     serializer_class = LessonSerializer
     permission_classes = [AllowAny]
 
+    # Show all lessons which you bought
     def get_queryset(self):
-        customer = self.request.user
+        customer = self.request.user #current logged user
         course_id = self.request.query_params.get('course')
 
         has_purchase = Purchase.objects.filter(
@@ -58,7 +59,7 @@ class LessonViewSet(viewsets.ModelViewSet):
 
         return Lesson.objects.filter(
             course_id=course_id,
-        ).order_by("order")
+        )
 
 
 # BUY BUY
@@ -76,14 +77,16 @@ class PurchasedViewSet(viewsets.ModelViewSet):
             .annotate(lessons_count=Count('course__lessons'))
         )
 
-    # with this method you can buy a course
+    # With this method you can buy a course
     def perform_create(self, serializer):
         customer = self.request.user
         course = serializer.validated_data['course']
         discount = serializer.validated_data.get('discount')
 
         if Purchase.objects.filter(customer=customer, course=course).exists():
-            raise ValidationError('You already purchased this course.')
+            raise ValidationError({
+                'message': 'Du hast schon den Kurs gekauft.'
+            })
 
         price = course.price
 
@@ -97,6 +100,7 @@ class PurchasedViewSet(viewsets.ModelViewSet):
 
         company = Company.objects.first()
 
+        # Creat invoice
         with transaction.atomic():
             # Purchase save
             purchase = serializer.save(
@@ -153,10 +157,11 @@ class PurchasedViewSet(viewsets.ModelViewSet):
             purchase.invoice = invoice
             purchase.save()
 
+        # Send Invoice via E-Mail
         email_service = SendInvoiceEmail()
         email_service.send_invoice_email(self.request, invoice)
 
-
+# 
 class DiscountCodeViewSet(viewsets.ModelViewSet):
     queryset = DiscountCode.objects.all()
     serializer_class = DiscountCodeSerializer
@@ -188,14 +193,7 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
             }
         )
 
-
-class CreateCourseInvoice:
-    def creat_course_invoice():
-        pass
-
-# Create only pdf
-
-
+# Create only Invoice in PDF
 class CreateInvoicePDF:
     def create_pdf(self, request, invoice):
         html_string = render_to_string('templates/invoice_course.html', {
@@ -211,9 +209,10 @@ class CreateInvoicePDF:
         # write_pdf belong to weasyprint
         pdf = html.write_pdf()
 
+        # Only Invoice in PDF
         return pdf
 
-
+# After purchase will send you the E-Mail with invoice
 class SendInvoiceEmail:
     def send_invoice_email(self, request, invoice):
         from django.core.mail import EmailMessage
@@ -226,10 +225,11 @@ class SendInvoiceEmail:
 
         # Build email
         body = {
-                "first_name": customer.first_name,
-            }
+            "first_name": customer.first_name,
+        }
 
-        html_answer = render_to_string("templates/email_with_invoice.html", body)
+        html_answer = render_to_string(
+            "templates/email_with_invoice.html", body)
         confirmation_message = EmailMessage(
             subject=f"Deine Rechnung {invoice.invoice_number}",
             body=html_answer,

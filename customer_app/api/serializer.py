@@ -25,6 +25,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id',
+            'type',
             'username',
             'image',
             'customer_number',
