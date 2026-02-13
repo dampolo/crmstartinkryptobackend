@@ -46,7 +46,7 @@ class LessonViewSet(viewsets.ModelViewSet):
 
     # Show all lessons which you bought
     def get_queryset(self):
-        customer = self.request.user #current logged user
+        customer = self.request.user  # current logged user
         course_id = self.request.query_params.get('course')
 
         has_purchase = Purchase.objects.filter(
@@ -82,6 +82,15 @@ class PurchasedViewSet(viewsets.ModelViewSet):
         customer = self.request.user
         course = serializer.validated_data['course']
         discount = serializer.validated_data.get('discount')
+
+        required_fields = [
+            "first_name",
+            "last_name",
+            "street",
+            "street_number",
+            "postcode",
+            "city",
+        ]
 
         if Purchase.objects.filter(customer=customer, course=course).exists():
             raise ValidationError({
@@ -126,14 +135,14 @@ class PurchasedViewSet(viewsets.ModelViewSet):
                 user_customer_first_name=customer.first_name,
                 user_customer_last_name=customer.last_name,
                 user_customer_street=customer.street,
-                user_customer_street_number=customer.number,
+                user_customer_street_number=customer.street_number,
                 user_customer_postcode=customer.postcode,
                 user_customer_city=customer.city,
 
                 # --- COMPANY SNAPSHOT ---
                 company_name=company.name,
                 company_street=company.street,
-                company_number=company.number,
+                company_street_number=company.street_number,
                 company_postcode=company.postcode,
                 company_city=company.city,
                 company_tax_number=company.tax_number,
@@ -161,7 +170,9 @@ class PurchasedViewSet(viewsets.ModelViewSet):
         email_service = SendInvoiceEmail()
         email_service.send_invoice_email(self.request, invoice)
 
-# 
+#
+
+
 class DiscountCodeViewSet(viewsets.ModelViewSet):
     queryset = DiscountCode.objects.all()
     serializer_class = DiscountCodeSerializer
@@ -194,6 +205,8 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
         )
 
 # Create only Invoice in PDF
+
+
 class CreateInvoicePDF:
     def create_pdf(self, request, invoice):
         html_string = render_to_string('templates/invoice_course.html', {
@@ -213,6 +226,8 @@ class CreateInvoicePDF:
         return pdf
 
 # After purchase will send you the E-Mail with invoice
+
+
 class SendInvoiceEmail:
     def send_invoice_email(self, request, invoice):
         from django.core.mail import EmailMessage

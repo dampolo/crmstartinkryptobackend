@@ -13,7 +13,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'logo',
             'name',
             'street',
-            'number',
+            'street_number',
             'postcode',
             'city',
             'owner_name',

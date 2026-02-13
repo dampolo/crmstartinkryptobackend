@@ -95,7 +95,7 @@ class Invoice(models.Model):
     # --- COMPANY SNAPSHOT ---
     company_name = models.CharField(max_length=255)
     company_street = models.CharField(max_length=255)
-    company_number = models.CharField(max_length=20)
+    company_street_number = models.CharField(max_length=20)
     company_postcode = models.CharField(max_length=10)
     company_city = models.CharField(max_length=100)
     company_tax_number = models.CharField(max_length=50)

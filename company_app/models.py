@@ -4,7 +4,7 @@ class Company(models.Model):
     logo = models.ImageField(upload_to='company/', blank=True, null=True)
     name = models.CharField(max_length=255)
     street = models.CharField(max_length=255)
-    number = models.CharField(max_length=20)
+    street_number = models.CharField(max_length=20)
     postcode = models.CharField(max_length=10)
     city = models.CharField(max_length=100)
     owner_name = models.CharField(max_length=255)

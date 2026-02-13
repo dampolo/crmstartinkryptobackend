@@ -24,11 +24,11 @@ class InvoiceSerializer(serializers.ModelSerializer):
             # customer snapshot
             'user_customer_id',
             'user_customer_first_name', 'user_customer_last_name', 'user_customer_street',
-            'user_customer_number', 'user_customer_postcode', 'user_customer_city',
+            'user_customer_street_number', 'user_customer_postcode', 'user_customer_city',
 
 
             # company snapshot
-            'company_name', 'company_street', 'company_number', 'company_postcode',
+            'company_name', 'company_street', 'company_street_number', 'company_postcode',
             'company_city', 'company_tax_number', 'company_email', 'company_bank',
             'company_bank_account', 'company_swift_code', 'company_logo',
 
@@ -57,13 +57,13 @@ class InvoiceSerializer(serializers.ModelSerializer):
             # Customer snapshot
             'user_customer_id',
             'user_customer_first_name', 'user_customer_last_name', 'user_customer_street',
-            'user_customer_number', 'user_customer_postcode', 'user_customer_city',
+            'user_customer_street_number', 'user_customer_postcode', 'user_customer_city',
 
 
             # Company snapshot
             'company_name',
             'company_street',
-            'company_number',
+            'company_street_number',
             'company_postcode',
             'company_city',
             'company_tax_number',
@@ -104,14 +104,14 @@ class InvoiceSerializer(serializers.ModelSerializer):
             user_customer_first_name=customer.first_name,
             user_customer_last_name=customer.last_name,
             user_customer_street=customer.street,
-            user_customer_street_number=customer.number,
+            user_customer_street_number=customer.street_number,
             user_customer_postcode=customer.postcode,
             user_customer_city=customer.city,
 
             # COMPANY SNAPSHOT
             company_name=company.name,
             company_street=company.street,
-            company_number=company.number,
+            company_street_number=company.street_number,
             company_postcode=company.postcode,
             company_city=company.city,
             company_tax_number=company.tax_number,
