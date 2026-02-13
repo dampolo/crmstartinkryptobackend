@@ -9,7 +9,7 @@ class CustomerView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CustomerSerializer
 
-# View only for Customer
+# This method show the whole profile from Customer
 class CustomerProfileView(RetrieveUpdateAPIView):
     serializer_class = CustomerProfileSerializer
     # Customer can see only his profile
