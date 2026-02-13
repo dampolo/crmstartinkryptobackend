@@ -83,14 +83,9 @@ class PurchasedViewSet(viewsets.ModelViewSet):
         course = serializer.validated_data['course']
         discount = serializer.validated_data.get('discount')
 
-        required_fields = [
-            "first_name",
-            "last_name",
-            "street",
-            "street_number",
-            "postcode",
-            "city",
-        ]
+        # This Method check if profile form User is complete
+        is_profile_complete = IsProfileComplete()
+        is_profile_complete.is_profile_complete(self.request, customer)
 
         if Purchase.objects.filter(customer=customer, course=course).exists():
             raise ValidationError({
@@ -261,3 +256,29 @@ class SendInvoiceEmail:
 
         confirmation_message.content_subtype = "html"
         confirmation_message.send()
+
+
+class IsProfileComplete:
+    def is_profile_complete(self, request, customer):
+
+        required_fields = [
+            "first_name",
+            "last_name",
+            "street",
+            "street_number",
+            "postcode",
+            "city",
+        ]
+
+        missing_fields = [
+            field for field in required_fields
+            if not getattr(customer, field)
+        ]
+
+        if missing_fields:
+            raise ValidationError(
+                {
+                    'message': 'Ergänze dein Profil',
+                    "missing_fields": missing_fields
+                }
+            )
