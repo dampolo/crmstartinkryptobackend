@@ -168,3 +168,24 @@ class InvoiceService(models.Model):
 
     def __str__(self):
         return f"Invoice {self.service_name}"
+
+
+
+class Tax(models.Model):
+    id = models.PositiveSmallIntegerField(
+        primary_key=True,
+        default=1,
+        editable=False
+    )
+
+    name = models.CharField(max_length=20, default="MwSt")
+    percent = models.DecimalField(max_digits=5, decimal_places=2, default=19.00)
+    active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        # Erzwingt immer nur ID = 1
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name} ({self.percent}%)"

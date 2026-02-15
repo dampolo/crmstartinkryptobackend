@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import InvoiceServiceView, InvoiceView, ServiceCatalogView
+from .views import InvoiceServiceView, InvoiceView, ServiceCatalogView, TaxAPIView
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -9,4 +9,5 @@ router.register(r'service-catalog', ServiceCatalogView, basename='service-catalo
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('tax/', TaxAPIView.as_view()),
 ]

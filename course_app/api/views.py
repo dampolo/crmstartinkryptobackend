@@ -171,7 +171,7 @@ class PurchasedViewSet(viewsets.ModelViewSet):
 class DiscountCodeViewSet(viewsets.ModelViewSet):
     queryset = DiscountCode.objects.all()
     serializer_class = DiscountCodeSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [AllowAny]
 
     @action(detail=False, methods=["post"], permission_classes=[AllowAny])
     def validate_code(self, request):

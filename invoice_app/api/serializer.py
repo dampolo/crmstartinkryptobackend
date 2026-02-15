@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from invoice_app.models import Invoice, InvoiceService, ServiceCatalog
+from invoice_app.models import Invoice, InvoiceService, ServiceCatalog, Tax
 from company_app.models import Company
 from auth_app.models import User
 from invoice_app.invoice_number import GenerateInvoiceNumber
@@ -136,3 +136,10 @@ class ServiceCatalogSerializer(serializers.ModelSerializer):
         model = ServiceCatalog
         fields = ['id', 'service_name', 'provision_type',
                   'provision_fixed', 'provision_percent']
+
+
+class TaxSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tax
+        fields = ['id', 'name', 'percent', 'active']
+        read_only_fields = ['id']
