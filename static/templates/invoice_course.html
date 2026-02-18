@@ -1,4 +1,5 @@
 {% load static %}
+{% load l10n %}
 
 <!DOCTYPE html>
 <html lang="de">
@@ -63,17 +64,18 @@
 
         <div class="totals">
           <p>
-            <span>Betrag:</span> <span>{{ invoice.amount }} €</span>
+            <span>Betrag:</span> <span>{{ invoice.amount}} €</span>
           </p>
           {% if invoice.discount %}
           <p>
-            <span>Rabatt ({{ invoice.discount }}%):</span> <span>-{{ invoice.discount_amount_value }} €</span>
+            <span>Rabatt ({{ invoice.discount}}%):</span> <span>-{{ invoice.discount_amount_value }} €</span>
           </p>
           {% endif %}
           <p>
             <span>MwSt. ({{invoice.value_tax}}%):</span> <span>{{ invoice.value_tax_amount }} €</span>
           </p>
-          <h3><span>Total:</span> <span>{{ invoice.investitions_amount }} €</span></h3>
+          
+          <h3><span>Total:</span> <span>{{ invoice.investitions_amount}} €</span></h3>
         </div>
 
         <footer>
