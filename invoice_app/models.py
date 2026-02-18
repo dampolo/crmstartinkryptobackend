@@ -112,10 +112,15 @@ class Invoice(models.Model):
     is_finalized = models.BooleanField(default=False)
 
     # --- INVOICE TOTALS ---
-    provision = models.DecimalField(decimal_places=2, max_digits=10)
+    # Discount
+    discount = models.DecimalField(decimal_places=2, max_digits=10, default=0) #%
+    discount_amount_value = models.DecimalField(decimal_places=2, max_digits=10, default=0) #€
+    # Amount
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     investitions_amount = models.DecimalField(decimal_places=2, max_digits=10)
+    provision = models.DecimalField(decimal_places=2, max_digits=10)
     value_tax = models.DecimalField(decimal_places=2, max_digits=10)
+    value_tax_amount = models.DecimalField(decimal_places=2, max_digits=10)
 
     def __str__(self):
         return f"Invoice {self.invoice_number}"

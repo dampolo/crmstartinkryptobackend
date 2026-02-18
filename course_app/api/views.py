@@ -12,7 +12,7 @@ from django.utils import timezone
 from decimal import ROUND_HALF_UP
 from django.db import transaction
 from company_app.models import Company
-from invoice_app.models import Invoice, InvoiceService, PriceType
+from invoice_app.models import Invoice, InvoiceService, PriceType, Tax
 from invoice_app.invoice_number import GenerateInvoiceNumber
 from django.template.loader import render_to_string
 from weasyprint import HTML
@@ -92,15 +92,44 @@ class PurchasedViewSet(viewsets.ModelViewSet):
                 'message': 'Du hast schon den Kurs gekauft.'
             })
 
-        price = course.price
+        net_price = course.price
+        tax = Tax.objects.first()
+        tax_percent = tax.percent
+
+        discount_amount_value = 0
+        discount_percent_value = 0
+        net_price_after_discount = 0
+        tax_amount = 0
 
         if discount:
             if not discount.active:
                 raise ValueError('Discount code is not active.')
-            price = price * (Decimal('100') -
-                             discount.percent_value) / Decimal('100')
 
-        price = price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            discount_amount = (
+                net_price * discount.percent_value / Decimal('100')
+            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+            discount_amount_value = discount_amount
+
+            tax_amount_with_discount = (
+                (net_price - discount_amount)  * tax_percent / Decimal('100')
+            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+            tax_amount = tax_amount_with_discount
+            
+            net_price_after_discount = net_price - discount_amount + tax_amount
+        else:
+            tax_amount_without_discount = (
+                net_price  * tax_percent / Decimal('100')
+            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            
+            tax_amount = tax_amount_without_discount
+
+            net_price_after_discount = net_price + tax_amount_without_discount
+
+        gross_price = (
+            net_price_after_discount
+        ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
         company = Company.objects.first()
 
@@ -109,7 +138,7 @@ class PurchasedViewSet(viewsets.ModelViewSet):
             # Purchase save
             purchase = serializer.save(
                 customer=customer,
-                price=price
+                price=gross_price
             )
 
             business = User.objects.get(type=User.ProfileType.BUSINESS)
@@ -119,10 +148,14 @@ class PurchasedViewSet(viewsets.ModelViewSet):
                 customer=customer,
                 invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
 
-                amount=price,
-                investitions_amount=price,
+                discount = discount.percent_value if discount else 0, #%
+                discount_amount_value = discount_amount_value if discount else 0, #€
+
+                amount=course.price,
+                investitions_amount=net_price_after_discount,
                 provision=0,
-                value_tax=0,
+                value_tax=tax_percent,
+                value_tax_amount=tax_amount,
 
                 # --- CUSTOMER SNAPSHOT ---
                 user_customer_id=customer.id,
@@ -152,8 +185,8 @@ class PurchasedViewSet(viewsets.ModelViewSet):
                 invoice=invoice,
                 service_name=course.name,
                 provision_type=PriceType.FIXED,
-                provision_fixed=price,
-                provision_amount=price
+                provision_fixed=course.price,
+                provision_amount=course.price
             )
 
             # Verbindung

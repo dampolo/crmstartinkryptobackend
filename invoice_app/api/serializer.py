@@ -33,7 +33,13 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'company_bank_account', 'company_swift_code', 'company_logo',
 
             # invoice totals
-            'provision', 'amount', 'investitions_amount', 'value_tax',
+            'discount',
+            'discount_amount_value',
+
+            'amount', 
+            'provision', 
+            'value_tax',
+            'investitions_amount', 
 
             # relations
             'customer', 'business',
@@ -72,6 +78,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'company_bank_account',
             'company_swift_code',
             'company_logo',
+
+            # invoice totals
+            'discount',
+            'discount_amount_value',
 
             # Services
             'services',
