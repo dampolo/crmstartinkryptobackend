@@ -223,14 +223,8 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
                 {"detail": "Discount code expired."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        return Response(
-            {
-                "code": discount.code,
-                "percent_value": discount.percent_value,
-                "valid": True
-            }
-        )
+        serializer = self.get_serializer(discount)
+        return Response(serializer.data)
 
 # Create only Invoice in PDF
 
