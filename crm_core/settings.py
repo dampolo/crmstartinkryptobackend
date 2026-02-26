@@ -68,7 +68,8 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "dj_rest_auth.registration",
     'rest_framework.authtoken',
-    'course_app'
+    'course_app',
+    'paypal_app'
 ]
 
 MIDDLEWARE = [
@@ -268,6 +269,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env("EMAIL")
 EMAIL_HOST_PASSWORD = env("START_IN_KRYPTO")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# PAYPAL
+PAYPAL_CLIENT_ID=env('PAYPAL_CLIENT_ID')
+
+PAYPAL_SECRET=env('PAYPAL_SECRET')
+
+PAYPAL_BASE_URL=env('PAYPAL_BASE_URL')
 
 
 REST_FRAMEWORK = {
