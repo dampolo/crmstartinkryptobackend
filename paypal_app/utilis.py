@@ -1,5 +1,7 @@
 import requests
 from django.conf import settings
+from course_app.models import Course
+from django.shortcuts import get_object_or_404
 
 def get_paypal_access_token():
     url = f"{settings.PAYPAL_BASE_URL}/v1/oauth2/token"
@@ -15,7 +17,7 @@ def get_paypal_access_token():
 
     return response.json()["access_token"]
 
-
+# Belong to create_order
 def create_paypal_order(amount):
     access_token = get_paypal_access_token()
 
@@ -52,3 +54,7 @@ def capture_paypal_order(order_id):
 
     response = requests.post(url, headers=headers)
     return response.json()
+
+def get_course_price(course_id):
+    course = get_object_or_404(Course, id=course_id)
+    return course.price
