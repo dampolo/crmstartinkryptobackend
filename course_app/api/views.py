@@ -200,7 +200,6 @@ class PurchasedViewSet(viewsets.ModelViewSet):
 
 #
 
-
 class DiscountCodeViewSet(viewsets.ModelViewSet):
     queryset = DiscountCode.objects.all()
     serializer_class = DiscountCodeSerializer

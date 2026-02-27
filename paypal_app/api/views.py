@@ -6,8 +6,9 @@ from paypal_app.utilis import create_paypal_order, capture_paypal_order, get_cou
 @api_view(["POST"])
 def create_order(request):
     course_id = request.data.get("course_id")
+    discount_id = request.data.get("discount")
 
-    amount = get_course_price(course_id)
+    amount = get_course_price(course_id, discount_id)
 
     order = create_paypal_order(amount)
     return Response({
