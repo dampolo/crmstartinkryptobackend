@@ -60,8 +60,7 @@ def capture_paypal_order(order_id):
 
 def get_course_price(course_id, discount_id):
     course = get_object_or_404(Course, id=course_id)
-    discount = get_object_or_404(DiscountCode, id=discount_id)
-
+    discount = DiscountCode.objects.filter(id=discount_id).first()
 
     tax = Tax.objects.first()
     tax_percent = tax.percent

@@ -1,26 +1,39 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from paypal_app.utilis import create_paypal_order, capture_paypal_order, get_course_price
+from course_app.models import Purchase
+from django.db import transaction
+from auth_app.models import User
+from course_app.api.views import SendInvoiceEmail
+from invoice_app.models import Invoice
+from invoice_app.invoice_number import GenerateInvoiceNumber
+from company_app.models import Company
+from rest_framework import views
 
 
-@api_view(["POST"])
-def create_order(request):
-    course_id = request.data.get("course_id")
-    discount_id = request.data.get("discount")
+class CreateOrderView(views.APIView):
+    def post(self, request, *args, **kwargs):
+        course = request.data.get('course_id')
+        discount = request.data.get('discount')
+        print(f'{course, discount}')
+        amount = get_course_price(course, discount)
 
-    amount = get_course_price(course_id, discount_id)
-
-    order = create_paypal_order(amount)
-    return Response({
-        "orderID": order["id"]
-    })
+        order = create_paypal_order(amount)
+        return Response({
+            "orderID": order["id"]
+        })
 
 
-@api_view(["POST"])
-def capture_order(request):
-    order_id = request.data.get("orderID")
-    capture = capture_paypal_order(order_id)
-    print('#################################################')
-    # TODO: verify payment status and update DB
+class CaptureOrderView(views.APIView):
+    def post(self, request, *args, **kwargs):
+        customer = request.user
+        order_id = request.data.get('orderID')
+        course = request.data.get('course_id')
+        discount = request.data.get('discount')
 
-    return Response(capture)
+        capture = capture_paypal_order(order_id)
+        
+        company = Company.objects.first()
+        
+
+        return Response(capture)

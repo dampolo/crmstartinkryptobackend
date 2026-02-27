@@ -1,0 +1,190 @@
+from decimal import Decimal, ROUND_HALF_UP
+from django.db import transaction
+from django.core.exceptions import ValidationError
+from company_app.models import Company
+from invoice_app.models import Invoice, InvoiceService, PriceType, Tax
+from course_app.models import Purchase
+from customer_app.api.views import IsProfileComplete
+from auth_app.models import User
+from invoice_app.invoice_number import GenerateInvoiceNumber
+from weasyprint import HTML
+from auth_app.models import User
+from django.template.loader import render_to_string
+
+class PurchaseService:
+    def create_purchase(self, customer, course, discount=None, request=None):
+        
+        # Prevent duplicate purchases
+        if Purchase.objects.filter(customer=customer, course=course).exists():
+            raise ValidationError("You already purchased this course.")
+
+        # Ensure profile complete
+        is_profile_complete = IsProfileComplete()
+        is_profile_complete.is_profile_complete(request, customer)
+
+        net_price = course.price
+        tax = Tax.objects.first()
+        tax_percent = tax.percent
+
+        discount_amount_value = Decimal("0.00")
+        tax_amount = Decimal("0.00")
+
+        # -------------------------
+        # DISCOUNT CALCULATION
+        # -------------------------
+        if discount:
+            if not discount.active:
+                raise ValidationError("Discount code is not active.")
+
+            discount_amount_value = (
+                net_price * discount.percent_value / Decimal("100")
+            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+            net_after_discount = net_price - discount_amount_value
+
+            tax_amount = (
+                net_after_discount * tax_percent / Decimal("100")
+            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+            gross_price = net_after_discount + tax_amount
+
+        else:
+            tax_amount = (
+                net_price * tax_percent / Decimal("100")
+            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+            gross_price = net_price + tax_amount
+
+        gross_price = gross_price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        company = Company.objects.first()
+        business = User.objects.get(type=User.ProfileType.BUSINESS)
+
+        # -------------------------
+        # DATABASE TRANSACTION
+        # -------------------------
+        with transaction.atomic():
+
+            purchase = Purchase.objects.create(
+                customer=customer,
+                course=course,
+                price=gross_price
+            )
+
+            invoice = Invoice.objects.create(
+                business=business,
+                customer=customer,
+                invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
+
+                discount=discount.percent_value if discount else 0,
+                discount_amount_value=discount_amount_value,
+
+                amount=course.price,
+                investitions_amount=gross_price,
+                provision=0,
+                value_tax=tax_percent,
+                value_tax_amount=tax_amount,
+
+                # --- CUSTOMER SNAPSHOT ---
+                user_customer_id=customer.id,
+                user_customer_number=customer.customer_number,
+                user_customer_first_name=customer.first_name,
+                user_customer_last_name=customer.last_name,
+                user_customer_street=customer.street,
+                user_customer_street_number=customer.street_number,
+                user_customer_postcode=customer.postcode,
+                user_customer_city=customer.city,
+
+                # --- COMPANY SNAPSHOT ---
+                company_name=company.name,
+                company_street=company.street,
+                company_street_number=company.street_number,
+                company_postcode=company.postcode,
+                company_city=company.city,
+                company_tax_number=company.tax_number,
+                company_email=company.email,
+                company_bank=company.bank,
+                company_bank_account=company.bank_account,
+                company_swift_code=company.swift_code,
+                company_logo=company.logo,
+            )
+
+            InvoiceService.objects.create(
+                invoice=invoice,
+                service_name=course.name,
+                provision_type=PriceType.FIXED,
+                provision_fixed=course.price,
+                provision_amount=course.price
+            )
+
+            purchase.invoice = invoice
+            purchase.save()
+
+        # -------------------------
+        # SEND EMAIL (outside transaction)
+        # -------------------------
+        if request:
+            email_service = SendInvoiceEmail()
+            email_service.send_invoice_email(request, invoice)
+
+        return purchase
+
+
+
+# Create only Invoice in PDF
+
+
+class CreateInvoicePDF:
+    def create_pdf(self, request, invoice):
+        html_string = render_to_string('templates/invoice_course.html', {
+            "invoice": invoice
+        })
+
+        # weasyprint
+        html = HTML(
+            string=html_string,
+            base_url=request.build_absolute_uri()
+        )
+
+        # write_pdf belong to weasyprint
+        pdf = html.write_pdf()
+
+        # Only Invoice in PDF
+        return pdf
+
+
+# After purchase will send you the E-Mail with invoice
+
+class SendInvoiceEmail:
+    def send_invoice_email(self, request, invoice):
+        from django.core.mail import EmailMessage
+        from django.conf import settings
+
+        customer = invoice.customer
+
+        pdf_service = CreateInvoicePDF()
+        pdf_file = pdf_service.create_pdf(request, invoice)
+
+        # Build email
+        body = {
+            "first_name": customer.first_name,
+        }
+
+        html_answer = render_to_string(
+            "templates/email_with_invoice.html", body)
+        confirmation_message = EmailMessage(
+            subject=f"Deine Rechnung {invoice.invoice_number}",
+            body=html_answer,
+            from_email=f"Start in Krypto <{settings.DEFAULT_FROM_EMAIL}>",
+            to=[customer.email],
+            reply_to=[settings.DEFAULT_FROM_EMAIL],
+        )
+
+        confirmation_message.attach(
+            f"invoice_{invoice.invoice_number}.pdf",
+            pdf_file,
+            "application/pdf"
+        )
+
+        confirmation_message.content_subtype = "html"
+        confirmation_message.send()
