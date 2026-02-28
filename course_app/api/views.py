@@ -56,7 +56,7 @@ class LessonViewSet(viewsets.ModelViewSet):
         ).exists()
 
         if not has_purchase:
-            raise PermissionDenied('You did not purchase this course.')
+            raise PermissionDenied({'messeage': 'You did not purchase this course.'})
 
         return Lesson.objects.filter(
             course_id=course_id,

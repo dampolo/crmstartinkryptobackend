@@ -1,6 +1,6 @@
 from decimal import Decimal, ROUND_HALF_UP
 from django.db import transaction
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from company_app.models import Company
 from invoice_app.models import Invoice, InvoiceService, PriceType, Tax
 from customer_app.api.views import IsProfileComplete
@@ -10,6 +10,7 @@ from weasyprint import HTML
 from auth_app.models import User
 from django.template.loader import render_to_string
 from purchase_app.models import Purchase
+from django.utils.translation import gettext_lazy as _
 
 class PurchaseService:
     def create_purchase(self, request, customer, course, discount):
@@ -20,7 +21,9 @@ class PurchaseService:
 
         # Prevent duplicate purchases
         if Purchase.objects.filter(customer=customer, course=course).exists():
-            raise ValidationError("You already purchased this course.")
+            raise ValidationError(
+        {"message": _("You already purchased this course.")}
+    )
 
         # Ensure profile complete
         net_price = course.price

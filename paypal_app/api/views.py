@@ -12,12 +12,22 @@ from decimal import Decimal
 from rest_framework import status
 from django.db import transaction
 from purchase_app.services import SendInvoiceEmail
+from rest_framework.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
+
+# PAYPAL
 class CreateOrderView(views.APIView):
     def post(self, request, *args, **kwargs):
         course_id = request.data.get("course_id")
         discount_id = request.data.get("discount")
         customer = request.user
+
+        # Prevent duplicate purchases
+        if Purchase.objects.filter(customer=customer, course=course_id).exists():
+            raise ValidationError(
+        {"message": _("You already purchased this course.")}
+    )
 
         pricing = calculate_course_price(course_id, discount_id, customer)
         purchase = Purchase.objects.create(
