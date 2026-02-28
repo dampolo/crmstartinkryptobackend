@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-28 23:19+0100\n"
+"POT-Creation-Date: 2026-03-01 00:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,6 +41,10 @@ msgstr ""
 #: .\auth_app\models.py:14
 msgid "Divers"
 msgstr ""
+
+#: .\course_app\api\views.py:60
+msgid "We have not received your payment."
+msgstr "Wir haben deine Zahlung noch nicht bekommen."
 
 #: .\course_app\models.py:8
 msgid "Draft"

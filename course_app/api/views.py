@@ -22,6 +22,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from purchase_app.models import Purchase
 from purchase_app.services import PurchaseService
+from django.utils.translation import gettext_lazy as _
 
 # You can see all courses which you can buy
 # Admin can create, update change the course
@@ -56,7 +57,7 @@ class LessonViewSet(viewsets.ModelViewSet):
         ).exists()
 
         if not has_purchase:
-            raise PermissionDenied({'messeage': 'You did not purchase this course.'})
+            raise PermissionDenied({"message": _("We have not received your payment.")})
 
         return Lesson.objects.filter(
             course_id=course_id,
