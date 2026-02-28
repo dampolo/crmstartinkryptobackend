@@ -1,10 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from paypal_app.utilis import create_paypal_order, capture_paypal_order, get_course_price
-from course_app.models import Purchase
 from django.db import transaction
 from auth_app.models import User
-from course_app.api.views import SendInvoiceEmail
 from invoice_app.models import Invoice
 from invoice_app.invoice_number import GenerateInvoiceNumber
 from company_app.models import Company

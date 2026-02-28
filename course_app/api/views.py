@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from course_app.models import Course, CourseFeature, Lesson, Purchase, DiscountCode
+from course_app.models import Course, CourseFeature, Lesson, DiscountCode
 from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -20,6 +20,8 @@ from django.http import HttpResponse
 from auth_app.models import User
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from purchase_app.models import Purchase
+from purchase_app.services import PurchaseService
 
 # You can see all courses which you can buy
 # Admin can create, update change the course
@@ -79,124 +81,13 @@ class PurchasedViewSet(viewsets.ModelViewSet):
 
     # With this method you can buy a course
     def perform_create(self, serializer):
-        customer = self.request.user
-        course = serializer.validated_data['course']
-        discount = serializer.validated_data.get('discount')
-
-        # This Method check if profile form User is complete
-        is_profile_complete = IsProfileComplete()
-        is_profile_complete.is_profile_complete(self.request, customer)
-
-        if Purchase.objects.filter(customer=customer, course=course).exists():
-            raise ValidationError({
-                'message': 'Du hast schon den Kurs gekauft.'
-            })
-
-        net_price = course.price
-        tax = Tax.objects.first()
-        tax_percent = tax.percent
-
-        discount_amount_value = 0
-        discount_percent_value = 0
-        net_price_after_discount = 0
-        tax_amount = 0
-
-        if discount:
-            if not discount.active:
-                raise ValueError('Discount code is not active.')
-
-            discount_amount = (
-                net_price * discount.percent_value / Decimal('100')
-            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-            discount_amount_value = discount_amount
-
-            tax_amount_with_discount = (
-                (net_price - discount_amount)  * tax_percent / Decimal('100')
-            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-            tax_amount = tax_amount_with_discount
-            
-            net_price_after_discount = net_price - discount_amount + tax_amount
-        else:
-            tax_amount_without_discount = (
-                net_price  * tax_percent / Decimal('100')
-            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-            
-            tax_amount = tax_amount_without_discount
-
-            net_price_after_discount = net_price + tax_amount_without_discount
-
-        gross_price = (
-            net_price_after_discount
-        ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-        company = Company.objects.first()
-
-        # Creat invoice
-        with transaction.atomic():
-            # Purchase save
-            purchase = serializer.save(
-                customer=customer,
-                price=gross_price
-            )
-
-            business = User.objects.get(type=User.ProfileType.BUSINESS)
-
-            invoice = Invoice.objects.create(
-                business=business,
-                customer=customer,
-                invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
-
-                discount = discount.percent_value if discount else 0, #%
-                discount_amount_value = discount_amount_value if discount else 0, #€
-
-                amount=course.price,
-                investitions_amount=net_price_after_discount,
-                provision=0,
-                value_tax=tax_percent,
-                value_tax_amount=tax_amount,
-
-                # --- CUSTOMER SNAPSHOT ---
-                user_customer_id=customer.id,
-                user_customer_number=customer.customer_number,
-                user_customer_first_name=customer.first_name,
-                user_customer_last_name=customer.last_name,
-                user_customer_street=customer.street,
-                user_customer_street_number=customer.street_number,
-                user_customer_postcode=customer.postcode,
-                user_customer_city=customer.city,
-
-                # --- COMPANY SNAPSHOT ---
-                company_name=company.name,
-                company_street=company.street,
-                company_street_number=company.street_number,
-                company_postcode=company.postcode,
-                company_city=company.city,
-                company_tax_number=company.tax_number,
-                company_email=company.email,
-                company_bank=company.bank,
-                company_bank_account=company.bank_account,
-                company_swift_code=company.swift_code,
-                company_logo=company.logo,
-            )
-
-            InvoiceService.objects.create(
-                invoice=invoice,
-                service_name=course.name,
-                provision_type=PriceType.FIXED,
-                provision_fixed=course.price,
-                provision_amount=course.price
-            )
-
-            # Verbindung
-            # invoice id
-            purchase.invoice = invoice
-            purchase.save()
-
-        # Send Invoice via E-Mail
-        email_service = SendInvoiceEmail()
-        email_service.send_invoice_email(self.request, invoice)
+        service = PurchaseService()
+        service.create_purchase(
+            customer=self.request.user,
+            course=serializer.validated_data['course'],
+            discount=serializer.validated_data.get('discount'),
+            request=self.request
+        )
 
 #
 

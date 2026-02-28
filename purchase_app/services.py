@@ -3,62 +3,66 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from company_app.models import Company
 from invoice_app.models import Invoice, InvoiceService, PriceType, Tax
-from course_app.models import Purchase
 from customer_app.api.views import IsProfileComplete
 from auth_app.models import User
 from invoice_app.invoice_number import GenerateInvoiceNumber
 from weasyprint import HTML
 from auth_app.models import User
 from django.template.loader import render_to_string
+from purchase_app.models import Purchase
 
 class PurchaseService:
-    def create_purchase(self, customer, course, discount=None, request=None):
+    def create_purchase(self, request, customer, course, discount=None):
         
+        # This Method check if profile form User is complete
+        is_profile_complete = IsProfileComplete()
+        is_profile_complete.is_profile_complete(request, customer)
+
         # Prevent duplicate purchases
         if Purchase.objects.filter(customer=customer, course=course).exists():
             raise ValidationError("You already purchased this course.")
 
         # Ensure profile complete
-        is_profile_complete = IsProfileComplete()
-        is_profile_complete.is_profile_complete(request, customer)
-
         net_price = course.price
         tax = Tax.objects.first()
         tax_percent = tax.percent
 
-        discount_amount_value = Decimal("0.00")
-        tax_amount = Decimal("0.00")
+        discount_amount_value = 0
+        discount_percent_value = 0
+        net_price_after_discount = 0
+        tax_amount = 0
 
-        # -------------------------
-        # DISCOUNT CALCULATION
-        # -------------------------
         if discount:
             if not discount.active:
-                raise ValidationError("Discount code is not active.")
+                raise ValueError('Discount code is not active.')
 
-            discount_amount_value = (
-                net_price * discount.percent_value / Decimal("100")
+            discount_amount = (
+                net_price * discount.percent_value / Decimal('100')
             ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-            net_after_discount = net_price - discount_amount_value
+            discount_amount_value = discount_amount
 
-            tax_amount = (
-                net_after_discount * tax_percent / Decimal("100")
+            tax_amount_with_discount = (
+                (net_price - discount_amount)  * tax_percent / Decimal('100')
             ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-            gross_price = net_after_discount + tax_amount
-
+            tax_amount = tax_amount_with_discount
+            
+            net_price_after_discount = net_price - discount_amount + tax_amount
         else:
-            tax_amount = (
-                net_price * tax_percent / Decimal("100")
+            tax_amount_without_discount = (
+                net_price  * tax_percent / Decimal('100')
             ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            
+            tax_amount = tax_amount_without_discount
 
-            gross_price = net_price + tax_amount
+            net_price_after_discount = net_price + tax_amount_without_discount
 
-        gross_price = gross_price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        gross_price = (
+            net_price_after_discount
+        ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
         company = Company.objects.first()
-        business = User.objects.get(type=User.ProfileType.BUSINESS)
 
         # -------------------------
         # DATABASE TRANSACTION
@@ -70,6 +74,8 @@ class PurchaseService:
                 course=course,
                 price=gross_price
             )
+
+            business = User.objects.get(type=User.ProfileType.BUSINESS)
 
             invoice = Invoice.objects.create(
                 business=business,
@@ -132,8 +138,6 @@ class PurchaseService:
 
 
 # Create only Invoice in PDF
-
-
 class CreateInvoicePDF:
     def create_pdf(self, request, invoice):
         html_string = render_to_string('templates/invoice_course.html', {
@@ -154,7 +158,6 @@ class CreateInvoicePDF:
 
 
 # After purchase will send you the E-Mail with invoice
-
 class SendInvoiceEmail:
     def send_invoice_email(self, request, invoice):
         from django.core.mail import EmailMessage

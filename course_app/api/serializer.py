@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from auth_app.models import User
-from course_app.models import Course, CourseFeature, Lesson, Purchase, DiscountCode
+from course_app.models import Course, CourseFeature, Lesson, DiscountCode
+from purchase_app.models import Purchase
 from django.utils import timezone
 
 # You can see all features from course, belong to CourseSerializer
