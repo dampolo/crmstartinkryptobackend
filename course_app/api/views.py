@@ -51,7 +51,8 @@ class LessonViewSet(viewsets.ModelViewSet):
 
         has_purchase = Purchase.objects.filter(
             customer=customer,
-            course_id=course_id
+            course_id=course_id,
+            status=Purchase.StatusChoices.PAID
         ).exists()
 
         if not has_purchase:
