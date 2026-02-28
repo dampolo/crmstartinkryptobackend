@@ -20,8 +20,6 @@ class CreateOrderView(views.APIView):
         customer = request.user
 
         pricing = calculate_course_price(course_id, discount_id, customer)
-        print('#############################')
-        print(pricing)
         purchase = Purchase.objects.create(
             customer=customer,
             course=pricing["course"],
@@ -108,7 +106,7 @@ class CaptureOrderView(views.APIView):
             customer=purchase.customer,
             invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
 
-            discount=purchase.percent_value if purchase.discount_amount else 0,
+            discount=purchase.discount_percent,
             discount_amount_value=purchase.discount_amount,
 
             amount=purchase.subtotal,

@@ -82,6 +82,7 @@ def calculate_course_price(course_id, discount_id, customer):
         ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
         discount_amount_value = discount_amount
+        discount_percent = discount.percent_value
 
         tax_amount_with_discount = (
             (net_price - discount_amount)  * tax_percent / Decimal('100')
