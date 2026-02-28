@@ -71,6 +71,18 @@ class PurchasedSerializer(serializers.ModelSerializer):
         source="course",
         write_only=True
     )
+
+    discount = serializers.PrimaryKeyRelatedField(
+        queryset=DiscountCode.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
+    total = serializers.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        read_only=True
+    )
     class Meta:
         model = Purchase
         fields = [
@@ -82,7 +94,7 @@ class PurchasedSerializer(serializers.ModelSerializer):
             'total',
             'created_at',
         ]
-        read_only_fields = ['price', 'created_at']
+        read_only_fields = ['created_at']
 
 class DiscountCodeSerializer(serializers.ModelSerializer):
     # is_valid exists only in the API response

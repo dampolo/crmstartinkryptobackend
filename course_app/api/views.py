@@ -33,8 +33,6 @@ class CourseViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 # You can see all features from course, belong to CourseViewSet
-
-
 class CourseFeatureViewSet(viewsets.ModelViewSet):
     queryset = CourseFeature.objects.all()
     serializer_class = CourseFeatureSerializer
@@ -85,10 +83,10 @@ class PurchasedViewSet(viewsets.ModelViewSet):
         # class in purchase_app
         service = PurchaseService()
         service.create_purchase(
+            request=self.request,
             customer=self.request.user,
             course=serializer.validated_data['course'],
             discount=serializer.validated_data.get('discount'),
-            request=self.request
         )
 
 #

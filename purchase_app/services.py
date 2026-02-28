@@ -31,6 +31,9 @@ class PurchaseService:
         net_price_after_discount = 0
         tax_amount = 0
 
+        discount_percent = Decimal("0.00")
+        discount_amount_value = Decimal("0.00")
+
         if discount:
             if not discount.active:
                 raise ValueError('Discount code is not active.')
@@ -40,6 +43,7 @@ class PurchaseService:
             ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
             discount_amount_value = discount_amount
+            discount_percent = discount.percent_value
 
             tax_amount_with_discount = (
                 (net_price - discount_amount)  * tax_percent / Decimal('100')
@@ -69,17 +73,17 @@ class PurchaseService:
         with transaction.atomic():
 
             purchase = Purchase.objects.create(
-                customer=customer,
-                course=course,
-                discount=discount,
-                status=Purchase.StatusChoices.OPEN,
-                subtotal=discount_amount_value,
-                tax_amount=tax_amount,
-                
-                discount_amount=discount_amount,
-
-                total=gross_price,
-            )
+            customer=customer,
+            course=course,
+            discount=discount,
+            status=Purchase.StatusChoices.OPEN,
+            subtotal=net_price,
+            discount_percent=discount_percent,
+            discount_amount=discount_amount_value,
+            tax_percent=tax_percent,
+            tax_amount=tax_amount,
+            total=gross_price,
+        )
 
             business = User.objects.get(type=User.ProfileType.BUSINESS)
 
@@ -88,10 +92,10 @@ class PurchaseService:
                 customer=customer,
                 invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
 
-                discount=discount.percent_value if discount else 0,
+                discount=discount_percent,
                 discount_amount_value=discount_amount_value,
 
-                amount=course.price,
+                amount=net_price,
                 investitions_amount=gross_price,
                 provision=0,
                 value_tax=tax_percent,
