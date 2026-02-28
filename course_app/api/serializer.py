@@ -79,7 +79,7 @@ class PurchasedSerializer(serializers.ModelSerializer):
             "course_id",
             'lessons_count',
             'discount',
-            'price',
+            'total',
             'created_at',
         ]
         read_only_fields = ['price', 'created_at']

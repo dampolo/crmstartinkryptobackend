@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from invoice_app.models import Tax
 from decimal import Decimal
 from decimal import ROUND_HALF_UP
+from purchase_app.models import Purchase
 
 def get_paypal_access_token():
     url = f"{settings.PAYPAL_BASE_URL}/v1/oauth2/token"
@@ -58,18 +59,19 @@ def capture_paypal_order(order_id):
     response = requests.post(url, headers=headers)
     return response.json()
 
-def get_course_price(course_id, discount_id):
+def calculate_course_price(course_id, discount_id, customer):
     course = get_object_or_404(Course, id=course_id)
     discount = DiscountCode.objects.filter(id=discount_id).first()
-
     tax = Tax.objects.first()
-    tax_percent = tax.percent
-    net_price = course.price
 
-    discount_amount_value = 0
-    discount_percent_value = 0
+    net_price = course.price
+    tax_percent = tax.percent
+
     net_price_after_discount = 0
     tax_amount = 0
+
+    discount_percent = Decimal("0.00")
+    discount_amount_value = Decimal("0.00")
 
     if discount:
         if not discount.active:
@@ -101,4 +103,14 @@ def get_course_price(course_id, discount_id):
         net_price_after_discount
     ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-    return gross_price
+
+    return {
+        "course": course,
+        "discount": discount,
+        "subtotal": net_price,
+        "discount_percent": discount_percent,
+        "discount_amount": discount_amount_value,
+        "tax_percent": tax_percent,
+        "tax_amount": tax_amount,
+        "total": gross_price,
+    }

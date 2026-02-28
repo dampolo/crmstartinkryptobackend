@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from purchase_app.models import Purchase
 
 class PurchaseService:
-    def create_purchase(self, request, customer, course, discount=None):
+    def create_purchase(self, request, customer, course, discount):
         
         # This Method check if profile form User is complete
         is_profile_complete = IsProfileComplete()
@@ -28,7 +28,6 @@ class PurchaseService:
         tax_percent = tax.percent
 
         discount_amount_value = 0
-        discount_percent_value = 0
         net_price_after_discount = 0
         tax_amount = 0
 
@@ -72,7 +71,14 @@ class PurchaseService:
             purchase = Purchase.objects.create(
                 customer=customer,
                 course=course,
-                price=gross_price
+                discount=discount,
+                status=Purchase.StatusChoices.OPEN,
+                subtotal=discount_amount_value,
+                tax_amount=tax_amount,
+                
+                discount_amount=discount_amount,
+
+                total=gross_price,
             )
 
             business = User.objects.get(type=User.ProfileType.BUSINESS)
@@ -134,8 +140,6 @@ class PurchaseService:
             email_service.send_invoice_email(request, invoice)
 
         return purchase
-
-
 
 # Create only Invoice in PDF
 class CreateInvoicePDF:

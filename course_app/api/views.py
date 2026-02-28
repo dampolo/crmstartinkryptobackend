@@ -81,6 +81,8 @@ class PurchasedViewSet(viewsets.ModelViewSet):
 
     # With this method you can buy a course
     def perform_create(self, serializer):
+
+        # class in purchase_app
         service = PurchaseService()
         service.create_purchase(
             customer=self.request.user,
