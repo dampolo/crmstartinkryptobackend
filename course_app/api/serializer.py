@@ -43,6 +43,7 @@ class LessonSerializer(serializers.ModelSerializer):
             'description_under_video',
             'order',
             'status',
+            'duration'
         ]
 
 # Belong to PurchasedSerializer 'course'
