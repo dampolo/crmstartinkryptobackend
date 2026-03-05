@@ -37,6 +37,7 @@ class LessonPDFSerializer(serializers.ModelSerializer):
 
 # If you bought course you can see all leassons from courses
 class LessonSerializer(serializers.ModelSerializer):
+    # pdfs works because of: related_name='pdfs'
     pdfs = LessonPDFSerializer(
         many= True, read_only= True
         )
