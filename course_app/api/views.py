@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from course_app.models import Course, CourseFeature, Lesson, DiscountCode
-from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer
+from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF
+from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer, LessonPDFSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from decimal import Decimal
@@ -119,4 +119,6 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
+class LessonPDFViewSet(viewsets.ModelViewSet):
+    queryset = LessonPDF.objects.all()
+    serializer_class = LessonPDFSerializer

@@ -139,4 +139,4 @@ class LessonPDF(models.Model):
     title = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return f"PDF für {self.lesson.title}"
+        return f"{self.title} für {self.lesson.title}"

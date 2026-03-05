@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from auth_app.models import User
-from course_app.models import Course, CourseFeature, Lesson, DiscountCode
+from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF
 from purchase_app.models import Purchase
 from django.utils import timezone
 
@@ -30,8 +30,17 @@ class CourseSerializer(serializers.ModelSerializer):
             'status',
         ]
 
+class LessonPDFSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LessonPDF
+        fields = ['id', 'title', 'file']
+
 # If you bought course you can see all leassons from courses
 class LessonSerializer(serializers.ModelSerializer):
+    pdfs = LessonPDFSerializer(
+        many= True, read_only= True
+        )
+
     class Meta:
         model = Lesson
         fields = [
@@ -43,7 +52,8 @@ class LessonSerializer(serializers.ModelSerializer):
             'description_under_video',
             'order',
             'status',
-            'duration'
+            'duration',
+            'pdfs'
         ]
 
 # Belong to PurchasedSerializer 'course'
