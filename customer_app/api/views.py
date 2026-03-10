@@ -3,7 +3,10 @@ from .serializer import CustomerSerializer, CustomerCommentSerializer, CustomerP
 from customer_app.models import UserComment
 from auth_app.models import User
 
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework import generics 
+
+
+
 from django.core.exceptions import ValidationError
 
 
@@ -12,21 +15,21 @@ class CustomerView(ModelViewSet):
     serializer_class = CustomerSerializer
 
 # This method show the whole profile from Customer
-class CustomerProfileView(RetrieveUpdateAPIView):
+class CustomerProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = CustomerProfileSerializer
     # Customer can see only his profile
     def get_object(self):
         return self.request.user
 
  # LIST + CREATE
-class CustomerCommentListCreate(ListCreateAPIView):
+class CustomerCommentListCreate(generics.ListCreateAPIView):
     serializer_class = CustomerCommentSerializer
 
     def get_queryset(self):
         return UserComment.objects.filter(customer_id=self.kwargs['customer_id'])
 
  # RETRIEVE + UPDATE
-class CustomerCommentDetail(RetrieveUpdateAPIView):
+class CustomerCommentDetail(generics.RetrieveUpdateAPIView):
     serializer_class = CustomerCommentSerializer
 
     def get_queryset(self):
