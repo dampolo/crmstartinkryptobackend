@@ -2,6 +2,10 @@ from rest_framework.viewsets import ModelViewSet
 from .serializer import CustomerSerializer, CustomerCommentSerializer, CustomerProfileSerializer
 from customer_app.models import UserComment
 from auth_app.models import User
+from invoice_app.models import Invoice
+from invoice_app.api.serializer import InvoiceSerializer
+from rest_framework.permissions import IsAuthenticated
+
 
 from rest_framework import generics 
 
@@ -60,3 +64,11 @@ class IsProfileComplete:
                     "missing_fields": missing_fields
                 }
             )
+
+# Customer can see all his Invoices
+class CustomerInvoicesAPI(generics.ListAPIView):
+    serializer_class = InvoiceSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Invoice.objects.filter(customer=self.request.user)
