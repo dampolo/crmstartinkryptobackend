@@ -34,7 +34,6 @@ class ApplyView(View):
                 body=html_to_me,
                 from_email=f"Start in Krypto <{settings.DEFAULT_FROM_EMAIL}>",  # always your verified sender
                 to=[settings.DEFAULT_FROM_EMAIL],
-                reply_to=[applicant_email],
             )
             
             if file:

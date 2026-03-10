@@ -95,7 +95,7 @@ class Invoice(models.Model):
     # --- COMPANY SNAPSHOT ---
     company_name = models.CharField(max_length=255)
     company_street = models.CharField(max_length=255)
-    company_number = models.CharField(max_length=20)
+    company_street_number = models.CharField(max_length=20)
     company_postcode = models.CharField(max_length=10)
     company_city = models.CharField(max_length=100)
     company_tax_number = models.CharField(max_length=50)
@@ -112,10 +112,15 @@ class Invoice(models.Model):
     is_finalized = models.BooleanField(default=False)
 
     # --- INVOICE TOTALS ---
-    provision = models.DecimalField(decimal_places=2, max_digits=10)
+    # Discount
+    discount = models.DecimalField(decimal_places=2, max_digits=10, default=0) #%
+    discount_amount_value = models.DecimalField(decimal_places=2, max_digits=10, default=0) #€
+    # Amount
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     investitions_amount = models.DecimalField(decimal_places=2, max_digits=10)
+    provision = models.DecimalField(decimal_places=2, max_digits=10)
     value_tax = models.DecimalField(decimal_places=2, max_digits=10)
+    value_tax_amount = models.DecimalField(decimal_places=2, max_digits=10)
 
     def __str__(self):
         return f"Invoice {self.invoice_number}"
@@ -168,3 +173,24 @@ class InvoiceService(models.Model):
 
     def __str__(self):
         return f"Invoice {self.service_name}"
+
+
+
+class Tax(models.Model):
+    id = models.PositiveSmallIntegerField(
+        primary_key=True,
+        default=1,
+        editable=False
+    )
+
+    name = models.CharField(max_length=20, default="MwSt")
+    percent = models.DecimalField(max_digits=5, decimal_places=2, default=19.00)
+    active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        # Erzwingt immer nur ID = 1
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name} ({self.percent}%)"

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from auth_app.models import User
-from course_app.models import Course, CourseFeature, Lesson, Purchase, DiscountCode
+from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF
+from purchase_app.models import Purchase
 from django.utils import timezone
 
 # You can see all features from course, belong to CourseSerializer
@@ -29,8 +30,18 @@ class CourseSerializer(serializers.ModelSerializer):
             'status',
         ]
 
+class LessonPDFSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LessonPDF
+        fields = ['id', 'title', 'file']
+
 # If you bought course you can see all leassons from courses
 class LessonSerializer(serializers.ModelSerializer):
+    # pdfs works because of: related_name='pdfs'
+    pdfs = LessonPDFSerializer(
+        many= True, read_only= True
+        )
+
     class Meta:
         model = Lesson
         fields = [
@@ -42,6 +53,8 @@ class LessonSerializer(serializers.ModelSerializer):
             'description_under_video',
             'order',
             'status',
+            'duration',
+            'pdfs'
         ]
 
 # Belong to PurchasedSerializer 'course'
@@ -70,18 +83,30 @@ class PurchasedSerializer(serializers.ModelSerializer):
         source="course",
         write_only=True
     )
+
+    discount = serializers.PrimaryKeyRelatedField(
+        queryset=DiscountCode.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
+    total = serializers.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        read_only=True
+    )
     class Meta:
         model = Purchase
         fields = [
-            'id',
+            'id', # id from purchased
             'course',
             "course_id",
             'lessons_count',
             'discount',
-            'price',
+            'total',
             'created_at',
         ]
-        read_only_fields = ['price', 'created_at']
+        read_only_fields = ['created_at']
 
 class DiscountCodeSerializer(serializers.ModelSerializer):
     # is_valid exists only in the API response

@@ -24,7 +24,7 @@ class User(AbstractUser):
 
     # Location
     street = models.CharField(max_length=200)
-    number = models.CharField(max_length=10)
+    street_number = models.CharField(max_length=10)
     postcode = models.CharField(max_length=20)
     city = models.CharField(max_length=100)
     phone = models.CharField(blank=True, max_length=20, default="")

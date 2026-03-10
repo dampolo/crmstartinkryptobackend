@@ -18,9 +18,16 @@ env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+# Because of this you will have comma
+USE_I18N = True
+USE_L10N = True
+LANGUAGE_CODE = 'de'
 
 # Initialise environment variables
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
@@ -63,7 +70,9 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "dj_rest_auth.registration",
     'rest_framework.authtoken',
-    'course_app'
+    'course_app',
+    'paypal_app',
+    'purchase_app'
 ]
 
 MIDDLEWARE = [
@@ -71,6 +80,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -262,6 +272,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env("EMAIL")
 EMAIL_HOST_PASSWORD = env("START_IN_KRYPTO")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# PAYPAL
+PAYPAL_CLIENT_ID=env('PAYPAL_CLIENT_ID')
+
+PAYPAL_SECRET=env('PAYPAL_SECRET')
+
+PAYPAL_BASE_URL=env('PAYPAL_BASE_URL')
 
 
 REST_FRAMEWORK = {

@@ -1,4 +1,5 @@
 {% load static %}
+{% load l10n %}
 
 <!DOCTYPE html>
 <html lang="de">
@@ -15,10 +16,10 @@
           <div class="company-info">
             <h1>{{ invoice.company_name }}</h1>
             <p>
-              {{ invoice.company_street }} {{ invoice.company_number }}<br />{{ invoice.company_postcode }} {{ invoice.company_city }}
+              {{ invoice.company_street }} {{ invoice.company_street_number }}<br />{{ invoice.company_postcode }} {{ invoice.company_city }}
             </p>
           </div>
-          {% comment %} <img class="logo" src="{{ invoice.company_logo.url }}" alt="logo" /> {% endcomment %}
+          <img class="logo" src="{{ invoice.company_logo.url }}" alt="logo" />
           <div class="invoice-info">
             <h2>RECHNUNG</h2>
             <p>Rechnung Nr.: {{ invoice.invoice_number }}</p>
@@ -63,12 +64,18 @@
 
         <div class="totals">
           <p>
-            <span>Betrag:</span> <span>{{ invoice.investitions_amount }} €</span>
+            <span>Betrag:</span> <span>{{ invoice.amount}} €</span>
           </p>
+          {% if invoice.discount %}
           <p>
-            <span>MwSt. (19%):</span> <span>{{ invoice.value_tax }} €</span>
+            <span>Rabatt ({{ invoice.discount}}%):</span> <span>-{{ invoice.discount_amount_value }} €</span>
           </p>
-          <h3><span>Total:</span> <span>{{ invoice.amount }} €</span></h3>
+          {% endif %}
+          <p>
+            <span>MwSt. ({{invoice.value_tax}}%):</span> <span>{{ invoice.value_tax_amount }} €</span>
+          </p>
+          
+          <h3><span>Total:</span> <span>{{ invoice.investitions_amount}} €</span></h3>
         </div>
 
         <footer>

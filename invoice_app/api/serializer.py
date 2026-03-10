@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from invoice_app.models import Invoice, InvoiceService, ServiceCatalog
+from invoice_app.models import Invoice, InvoiceService, ServiceCatalog, Tax
 from company_app.models import Company
 from auth_app.models import User
 from invoice_app.invoice_number import GenerateInvoiceNumber
@@ -24,16 +24,22 @@ class InvoiceSerializer(serializers.ModelSerializer):
             # customer snapshot
             'user_customer_id',
             'user_customer_first_name', 'user_customer_last_name', 'user_customer_street',
-            'user_customer_number', 'user_customer_postcode', 'user_customer_city',
+            'user_customer_street_number', 'user_customer_postcode', 'user_customer_city',
 
 
             # company snapshot
-            'company_name', 'company_street', 'company_number', 'company_postcode',
+            'company_name', 'company_street', 'company_street_number', 'company_postcode',
             'company_city', 'company_tax_number', 'company_email', 'company_bank',
             'company_bank_account', 'company_swift_code', 'company_logo',
 
             # invoice totals
-            'provision', 'amount', 'investitions_amount', 'value_tax',
+            'discount',
+            'discount_amount_value',
+
+            'amount', 
+            'provision', 
+            'value_tax',
+            'investitions_amount', 
 
             # relations
             'customer', 'business',
@@ -57,13 +63,13 @@ class InvoiceSerializer(serializers.ModelSerializer):
             # Customer snapshot
             'user_customer_id',
             'user_customer_first_name', 'user_customer_last_name', 'user_customer_street',
-            'user_customer_number', 'user_customer_postcode', 'user_customer_city',
+            'user_customer_street_number', 'user_customer_postcode', 'user_customer_city',
 
 
             # Company snapshot
             'company_name',
             'company_street',
-            'company_number',
+            'company_street_number',
             'company_postcode',
             'company_city',
             'company_tax_number',
@@ -72,6 +78,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'company_bank_account',
             'company_swift_code',
             'company_logo',
+
+            # invoice totals
+            'discount',
+            'discount_amount_value',
 
             # Services
             'services',
@@ -104,14 +114,14 @@ class InvoiceSerializer(serializers.ModelSerializer):
             user_customer_first_name=customer.first_name,
             user_customer_last_name=customer.last_name,
             user_customer_street=customer.street,
-            user_customer_street_number=customer.number,
+            user_customer_street_number=customer.street_number,
             user_customer_postcode=customer.postcode,
             user_customer_city=customer.city,
 
             # COMPANY SNAPSHOT
             company_name=company.name,
             company_street=company.street,
-            company_number=company.number,
+            company_street_number=company.street_number,
             company_postcode=company.postcode,
             company_city=company.city,
             company_tax_number=company.tax_number,
@@ -136,3 +146,10 @@ class ServiceCatalogSerializer(serializers.ModelSerializer):
         model = ServiceCatalog
         fields = ['id', 'service_name', 'provision_type',
                   'provision_fixed', 'provision_percent']
+
+
+class TaxSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tax
+        fields = ['id', 'name', 'percent', 'active']
+        read_only_fields = ['id']

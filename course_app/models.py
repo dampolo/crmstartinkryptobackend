@@ -3,6 +3,10 @@ from auth_app.models import User
 from django.utils.translation import gettext_lazy as _
 from invoice_app.models import Invoice
 
+import subprocess
+import json
+from django.db import models
+
 
 class Status(models.TextChoices):
     DRAFT = "draft", _("Draft")
@@ -17,7 +21,6 @@ class Language(models.TextChoices):
 # -------------------------
 # Bonus
 # -------------------------
-
 class DiscountCode(models.Model):
     code = models.CharField(max_length=50, unique=True)
     percent_value = models.PositiveIntegerField(help_text="Rabatt % Wert")
@@ -64,8 +67,6 @@ class Course(models.Model):
         return self.name
 
 # Short describtion of th coures in points
-
-
 class CourseFeature(models.Model):
     course = models.ForeignKey(
         Course,
@@ -91,7 +92,33 @@ class Lesson(models.Model):
     description_under_video = models.TextField(blank=True)
     order = models.DecimalField(
         max_digits=4, decimal_places=2, null=False, blank=False, default=0)
+    duration = models.PositiveIntegerField(null=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # save file first
 
+        if self.video and not self.duration:
+            video_path = self.video.path
+
+            result = subprocess.run(
+                [
+                    "ffprobe",
+                    "-v", "error",
+                    "-select_streams", "v:0",
+                    "-show_entries", "format=duration",
+                    "-of", "json",
+                    video_path,
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            output = json.loads(result.stdout)
+            duration = float(output["format"]["duration"])
+
+            self.duration = int(duration)
+            super().save(update_fields=["duration"])
+            
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
@@ -112,36 +139,4 @@ class LessonPDF(models.Model):
     title = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return f"PDF für {self.lesson.title}"
-
-
-# -------------------------
-# Buy
-# -------------------------
-class Purchase(models.Model):
-    invoice = models.OneToOneField(
-        Invoice,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='purchase'
-    )
-    
-    customer = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='purchases',
-        limit_choices_to={'type': User.ProfileType.CUSTOMER}
-    )
-
-    course = models.ForeignKey(
-        Course, on_delete=models.CASCADE, related_name='purchases')
-
-    discount = models.ForeignKey(
-        DiscountCode, on_delete=models.SET_NULL, null=True, blank=True)
-
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.customer.username} kaufte {self.course.name}"
+        return f"{self.title} für {self.lesson.title}"

@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
-from .serializer import InvoiceSerializer, InvoiceServiceSerializer, ServiceCatalogSerializer
-from invoice_app.models import Invoice, InvoiceService, ServiceCatalog
+from .serializer import InvoiceSerializer, InvoiceServiceSerializer, ServiceCatalogSerializer, TaxSerializer
+from invoice_app.models import Invoice, InvoiceService, ServiceCatalog, Tax
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -15,6 +15,8 @@ from weasyprint import HTML
 from django.conf import settings
 import os
 from rest_framework import permissions 
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 
 # You can onyl see the list of the invoices but you cannot change the invoice
 
@@ -191,3 +193,26 @@ class ServiceCatalogView(ModelViewSet):
             },
             status=status.HTTP_200_OK,
         )
+
+class TaxAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        tax, created = Tax.objects.get_or_create(pk=1)
+        serializer = TaxSerializer(tax)
+        return Response(serializer.data)
+    
+    def patch(self, request):
+        tax, created = Tax.objects.get_or_create(pk=1)
+
+        serializer = TaxSerializer (
+            tax, 
+            data=request.data,
+            partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

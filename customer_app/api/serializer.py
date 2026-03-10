@@ -25,6 +25,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id',
+            'type',
             'username',
             'image',
             'customer_number',
@@ -32,7 +33,7 @@ class CustomerSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'street',
-            'number',
+            'street_number',
             'postcode',
             'city',
             'email',
@@ -96,7 +97,7 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'street',
-            'number',
+            'street_number',
             'postcode',
             'city',
             'email',
