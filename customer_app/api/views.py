@@ -3,7 +3,7 @@ from .serializer import CustomerSerializer, CustomerCommentSerializer, CustomerP
 from customer_app.models import UserComment
 from auth_app.models import User
 from invoice_app.models import Invoice
-from invoice_app.api.serializer import InvoiceSerializer
+from invoice_app.api import serializer
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -67,7 +67,7 @@ class IsProfileComplete:
 
 # Customer can see all his Invoices
 class CustomerInvoicesAPI(generics.ListAPIView):
-    serializer_class = InvoiceSerializer
+    serializer_class = serializer.CustomerInvoiceSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):

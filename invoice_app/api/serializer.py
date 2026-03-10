@@ -153,3 +153,8 @@ class TaxSerializer(serializers.ModelSerializer):
         model = Tax
         fields = ['id', 'name', 'percent', 'active']
         read_only_fields = ['id']
+
+class CustomerInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invoice
+        read_only_fields = ['id', 'invoice_number', 'service', 'invoice_status', 'created_at']
