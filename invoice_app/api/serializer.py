@@ -155,6 +155,15 @@ class TaxSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 class CustomerInvoiceSerializer(serializers.ModelSerializer):
+    service_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Invoice
-        read_only_fields = ['id', 'invoice_number', 'service', 'invoice_status', 'created_at']
+        fields = ['id', 'invoice_number', 'service_name', 'invoice_status', 'created_at']    
+        read_only_fields = ['id', 'invoice_number', 'service_name','invoice_status', 'created_at']
+
+    def get_service_name(self, obj):
+        service = obj.services.first()
+        if service:
+            return service.service_name
+        return ""
