@@ -15,6 +15,9 @@ class PaymentMethod(models.TextChoices):
     CASH = 'cash', _('Cash')
     PAYU = 'payu', _('payU')
 
+class InvoiceCategory(models.TextChoices):
+    COURSE = "course", _("Course")
+    SERVICE = "service", _("Service")
 
 class ServiceCatalog(models.Model):
 
@@ -46,17 +49,17 @@ class ServiceCatalog(models.Model):
     def __str__(self):
         return f"{self.name} ({self.price_type})"
 
+class InvoiceType(models.TextChoices):
+    INVOICE = 'invoice', _('Invoice')
+    CREDIT_NOTE = 'credit_note', _('Credit Note')
+
+class PaymentStatus(models.TextChoices):
+    PENDING = 'pending', _('Pending')       # created but not yet due
+    UNPAID = 'unpaid', _('Unpaid')         # overdue / not paid
+    PAID = 'paid', _('Paid')               # payment received
+    CANCELED = 'canceled', _('Canceled')   # invoice is canceled (storno)
 
 class Invoice(models.Model):
-    class InvoiceType(models.TextChoices):
-        INVOICE = 'invoice', _('Invoice')
-        CREDIT_NOTE = 'credit_note', _('Credit Note')
-
-    class PaymentStatus(models.TextChoices):
-        PENDING = 'pending', _('Pending')       # created but not yet due
-        UNPAID = 'unpaid', _('Unpaid')         # overdue / not paid
-        PAID = 'paid', _('Paid')               # payment received
-        CANCELED = 'canceled', _('Canceled')   # invoice is canceled (storno)
 
     invoice_number = models.CharField(max_length=50, unique=True)
 
@@ -75,7 +78,13 @@ class Invoice(models.Model):
     payment_method = models.CharField(
         max_length=20,
         choices=PaymentMethod.choices,
-        default=PaymentMethod.CASH
+        default=PaymentMethod.PAYPAL
+    )
+
+    category = models.CharField(
+        max_length=20,
+        choices=InvoiceCategory.choices,
+        default=InvoiceCategory.COURSE
     )
 
     # create the invocie
