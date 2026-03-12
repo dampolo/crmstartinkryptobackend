@@ -47,9 +47,15 @@ class InvoiceSerializer(serializers.ModelSerializer):
             # system fields
             'created_at', 'updated_at', 'is_finalized',
 
+            'notes_template'
+            'notes'
+            'payment_method'
+            'invoice_category'
+
             # SERVICES LAST
             'services'
         ]
+
         # Read-only fields: CANNOT be set by frontend
         read_only_fields = [
             'id',
@@ -159,8 +165,8 @@ class CustomerInvoiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Invoice
-        fields = ['id', 'invoice_number', 'service_name', 'invoice_status', 'created_at']    
-        read_only_fields = ['id', 'invoice_number', 'service_name','invoice_status', 'created_at']
+        fields = ['id', 'invoice_number', 'service_name', 'invoice_status', 'invoice_category','created_at']    
+        read_only_fields = ['id', 'invoice_number', 'service_name','invoice_status', 'invoice_category', 'created_at']
 
     def get_service_name(self, obj):
         service = obj.services.first()

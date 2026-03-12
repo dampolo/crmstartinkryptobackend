@@ -88,7 +88,7 @@ class Invoice(models.Model):
         default=PaymentMethod.PAYPAL
     )
 
-    category = models.CharField(
+    invoice_category = models.CharField(
         max_length=20,
         choices=InvoiceCategory.choices,
         default=InvoiceCategory.COURSE

@@ -1,6 +1,6 @@
 from django.db import models
 from auth_app.models import User
-from invoice_app.models import Invoice
+from invoice_app.models import Invoice, PaymentStatus
 from course_app.models import Course, DiscountCode
 from django.utils.translation import gettext_lazy as _
 
@@ -9,12 +9,6 @@ from django.utils.translation import gettext_lazy as _
 # Buy
 # -------------------------
 class Purchase(models.Model):
-    class StatusChoices(models.TextChoices):
-        OPEN = 'OPEN', _('Open')
-        PAID = 'PAID', _('Paid')
-        FAILED = 'FAILED', _('Failed')
-        CANCELED = 'CANCELED', _('Canceled')
-
     invoice = models.OneToOneField(
         Invoice,
         on_delete=models.SET_NULL,
@@ -43,11 +37,11 @@ class Purchase(models.Model):
 
     status = models.CharField(
         max_length=20,
-        choices=StatusChoices.choices,
-        default=StatusChoices.OPEN
+        choices=PaymentStatus.choices,
+        default=PaymentStatus.UNPAID
     )
 
-    # 🔒 SNAPSHOT VALUES
+    # SNAPSHOT VALUES
     subtotal = models.DecimalField(max_digits=8, decimal_places=2)
 
     tax_percent = models.DecimalField(max_digits=5, decimal_places=2)

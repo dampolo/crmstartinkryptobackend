@@ -2,7 +2,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from company_app.models import Company
-from invoice_app.models import Invoice, InvoiceService, PriceType, Tax
+from invoice_app.models import Invoice, InvoiceService, PriceType, Tax, PaymentStatus
 from customer_app.api.views import IsProfileComplete
 from auth_app.models import User
 from invoice_app.invoice_number import GenerateInvoiceNumber
@@ -25,7 +25,6 @@ class PurchaseService:
         {"message": _("You already purchased this course.")}
     )
 
-        # Ensure profile complete
         net_price = course.price
         tax = Tax.objects.first()
         tax_percent = tax.percent
@@ -79,7 +78,7 @@ class PurchaseService:
             customer=customer,
             course=course,
             discount=discount,
-            status=Purchase.StatusChoices.OPEN,
+            status=PaymentStatus.UNPAID,
             subtotal=net_price,
             discount_percent=discount_percent,
             discount_amount=discount_amount_value,

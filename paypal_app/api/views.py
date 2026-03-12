@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from paypal_app.utilis import create_paypal_order, capture_paypal_order, calculate_course_price
 from django.db import transaction
 from auth_app.models import User
-from invoice_app.models import Invoice, InvoiceService, PriceType
+from invoice_app.models import Invoice, InvoiceService, PriceType, PaymentStatus, PaymentMethod, InvoiceCategory
 from invoice_app.invoice_number import GenerateInvoiceNumber
 from company_app.models import Company
 from rest_framework import views
@@ -26,15 +26,15 @@ class CreateOrderView(views.APIView):
         # Prevent duplicate purchases
         if Purchase.objects.filter(customer=customer, course=course_id).exists():
             raise ValidationError(
-        {"message": _("You already purchased this course.")}
-    )
+                {"message": _("You already purchased this course.")}
+            )
 
         pricing = calculate_course_price(course_id, discount_id, customer)
         purchase = Purchase.objects.create(
             customer=customer,
             course=pricing["course"],
             discount=pricing["discount"],
-            status=Purchase.StatusChoices.OPEN,
+            status=PaymentStatus.UNPAID,
             subtotal=pricing["subtotal"],
             discount_percent=pricing["discount_percent"],
             discount_amount=pricing["discount_amount"],
@@ -52,6 +52,8 @@ class CreateOrderView(views.APIView):
             "orderID": paypal_order["id"]
         })
 
+
+# PAYPAL
 class CaptureOrderView(views.APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -75,7 +77,7 @@ class CaptureOrderView(views.APIView):
             )
 
         # 2 Idempotency check
-        if purchase.status == Purchase.StatusChoices.PAID:
+        if purchase.status == PaymentStatus.PAID:
             return Response({"message": "Already captured"})
 
         # 3 Capture PayPal
@@ -84,7 +86,7 @@ class CaptureOrderView(views.APIView):
         capture_status = capture_data["status"]
 
         if capture_status != "COMPLETED":
-            purchase.status = Purchase.StatusChoices.FAILED
+            purchase.status = PaymentStatus.UNPAID
             purchase.save(update_fields=["status"])
             return Response(
                 {"error": "Payment not completed"},
@@ -104,7 +106,7 @@ class CaptureOrderView(views.APIView):
             )
 
         # 5 Mark as paid
-        purchase.status = Purchase.StatusChoices.PAID
+        purchase.status = PaymentStatus.PAID
         purchase.save(update_fields=["status"])
 
         company = Company.objects.first()
@@ -115,6 +117,9 @@ class CaptureOrderView(views.APIView):
             business=business,
             customer=purchase.customer,
             invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
+            invoice_status=PaymentStatus.PAID,
+            payment_method=PaymentMethod.PAYPAL,
+            invoice_category=InvoiceCategory.COURSE,
 
             discount=purchase.discount_percent,
             discount_amount_value=purchase.discount_amount,
@@ -147,6 +152,7 @@ class CaptureOrderView(views.APIView):
             company_bank_account=company.bank_account,
             company_swift_code=company.swift_code,
             company_logo=company.logo,
+            
         )
 
         InvoiceService.objects.create(
@@ -162,7 +168,7 @@ class CaptureOrderView(views.APIView):
 
         email_service = SendInvoiceEmail()
         email_service.send_invoice_email(request, invoice)
-        
+
         return Response({
             "status": "success",
             "invoice_id": invoice.id
