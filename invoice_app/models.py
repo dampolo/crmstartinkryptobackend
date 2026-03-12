@@ -9,6 +9,12 @@ class PriceType(models.TextChoices):
     FIXED = 'fixed', _('Fixed Amount (€)')
     PERCENT = 'percent', _('Percentage (%)')
 
+class PaymentMethod(models.TextChoices):
+    PAYPAL = 'paypal', _('PayPal')
+    BANK_TRANSFER = 'bank_transfer', _('Bank Transfer')
+    CASH = 'cash', _('Cash')
+    PAYU = 'payu', _('payU')
+
 
 class ServiceCatalog(models.Model):
 
@@ -66,6 +72,12 @@ class Invoice(models.Model):
         default=PaymentStatus.UNPAID
     )
 
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PaymentMethod.choices,
+        default=PaymentMethod.CASH
+    )
+
     # create the invocie
     business = models.ForeignKey(
         User,
@@ -121,6 +133,8 @@ class Invoice(models.Model):
     provision = models.DecimalField(decimal_places=2, max_digits=10)
     value_tax = models.DecimalField(decimal_places=2, max_digits=10)
     value_tax_amount = models.DecimalField(decimal_places=2, max_digits=10)
+
+    notes = models.TextField(blank=True)
 
     def __str__(self):
         return f"Invoice {self.invoice_number}"
