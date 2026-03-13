@@ -4,4 +4,4 @@ from purchase_app.models import Purchase
 class CustomerPurchasesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Purchase
-        fileds = ['invoice', 'customer', 'payment_method', 'course', 'discount', 'total', 'status' ]
+        fields = ['invoice', 'customer', 'payment_method', 'course', 'discount', 'total', 'status' ]
