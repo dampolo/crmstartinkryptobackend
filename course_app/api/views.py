@@ -12,7 +12,7 @@ from django.utils import timezone
 from decimal import ROUND_HALF_UP
 from django.db import transaction
 from company_app.models import Company
-from invoice_app.models import Invoice, InvoiceService, PriceType, Tax
+from invoice_app.models import Invoice, InvoiceService, PriceType, Tax,PaymentStatus
 from invoice_app.invoice_number import GenerateInvoiceNumber
 from django.template.loader import render_to_string
 from weasyprint import HTML
@@ -53,7 +53,7 @@ class LessonViewSet(viewsets.ModelViewSet):
         has_purchase = Purchase.objects.filter(
             customer=customer,
             course_id=course_id,
-            status=Purchase.StatusChoices.PAID
+            status=PaymentStatus.PAID
         ).exists()
 
         if not has_purchase:
