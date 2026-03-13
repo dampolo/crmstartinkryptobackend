@@ -2,7 +2,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from company_app.models import Company
-from invoice_app.models import Invoice, InvoiceService, PriceType, Tax, PaymentStatus
+from invoice_app.models import Invoice, InvoiceService, PriceType, Tax, PaymentStatus, PaymentMethod
 from customer_app.api.views import IsProfileComplete
 from auth_app.models import User
 from invoice_app.invoice_number import GenerateInvoiceNumber
@@ -12,6 +12,7 @@ from django.template.loader import render_to_string
 from purchase_app.models import Purchase
 from django.utils.translation import gettext_lazy as _
 
+# For Bank Transfer
 class PurchaseService:
     def create_purchase(self, request, customer, course, discount):
         
@@ -85,6 +86,7 @@ class PurchaseService:
             tax_percent=tax_percent,
             tax_amount=tax_amount,
             total=gross_price,
+            payment_method=PaymentMethod.BANK_TRANSFER
         )
 
             business = User.objects.get(type=User.ProfileType.BUSINESS)
@@ -93,6 +95,7 @@ class PurchaseService:
                 business=business,
                 customer=customer,
                 invoice_number=GenerateInvoiceNumber.generate_invoice_number(),
+                payment_method=PaymentMethod.BANK_TRANSFER,
 
                 discount=discount_percent,
                 discount_amount_value=discount_amount_value,

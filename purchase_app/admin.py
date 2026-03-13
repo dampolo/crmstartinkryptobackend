@@ -5,7 +5,7 @@ from purchase_app.models import Purchase
 
 
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ['invoice', 'customer', 'course', 'discount', 'total' ]
+    list_display = ['invoice', 'customer', 'course', 'discount', 'total', 'status' ]
 
 
 admin.site.register(Purchase, PurchaseAdmin)

@@ -41,6 +41,7 @@ class CreateOrderView(views.APIView):
             tax_percent=pricing["tax_percent"],
             tax_amount=pricing["tax_amount"],
             total=pricing["total"],
+            payment_method=PaymentMethod.PAYPAL
         )
 
         paypal_order = create_paypal_order(pricing["total"])

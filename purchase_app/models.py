@@ -1,6 +1,6 @@
 from django.db import models
 from auth_app.models import User
-from invoice_app.models import Invoice, PaymentStatus
+from invoice_app.models import Invoice, PaymentStatus, PaymentMethod
 from course_app.models import Course, DiscountCode
 from django.utils.translation import gettext_lazy as _
 
@@ -39,6 +39,12 @@ class Purchase(models.Model):
         max_length=20,
         choices=PaymentStatus.choices,
         default=PaymentStatus.UNPAID
+    )
+
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PaymentMethod.choices,
+        default=PaymentMethod.PAYPAL
     )
 
     # SNAPSHOT VALUES

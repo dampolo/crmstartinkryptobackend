@@ -60,7 +60,7 @@ def capture_paypal_order(order_id):
     return response.json()
 
 
-# calculate price.
+# calculate price for PAYPAL.
 def calculate_course_price(course_id, discount_id, customer):
     course = get_object_or_404(Course, id=course_id)
     discount = DiscountCode.objects.filter(id=discount_id).first()
