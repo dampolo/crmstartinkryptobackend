@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializer import InvoiceSerializer, InvoiceServiceSerializer, ServiceCatalogSerializer, TaxSerializer
-from invoice_app.models import Invoice, InvoiceService, ServiceCatalog, Tax
+from invoice_app.models import Invoice, InvoiceService, ServiceCatalog, Tax, PaymentStatus
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -19,8 +19,6 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 
 # You can onyl see the list of the invoices but you cannot change the invoice
-
-
 class InvoiceView(ModelViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
@@ -32,7 +30,7 @@ class InvoiceView(ModelViewSet):
         new_status = request.data.get("invoice_status")
 
         # Validate input
-        valid_statuses = dict(Invoice.PaymentStatus.choices).keys()
+        valid_statuses = dict(PaymentStatus.choices).keys()
         if new_status not in valid_statuses:
             return Response(
                 {"error": f"Invalid payment_status. Allowed: {list(valid_statuses)}"},

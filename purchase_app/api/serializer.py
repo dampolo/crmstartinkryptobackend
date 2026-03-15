@@ -5,11 +5,12 @@ from purchase_app.models import Purchase
 class CustomerPurchasesSerializer(serializers.ModelSerializer):
     invoice_number = serializers.SerializerMethodField()
     invoice_category = serializers.SerializerMethodField()
+    course_id = serializers.CharField(source='course.id', read_only=True)
 
     class Meta:
         model = Purchase
-        fields = ['invoice_number', 'customer', 'payment_method', 'invoice_category', 'discount', 'total', 'status', 'created_at' ]
-        read_only_fields = ['invoice_number', 'customer', 'payment_method', 'invoice_category', 'discount', 'total', 'status', 'created_at' ]
+        fields = ['id', 'course_id', 'invoice_number', 'customer', 'payment_method', 'invoice_category', 'discount', 'total', 'status', 'created_at' ]
+        read_only_fields = ['id', 'course_id', 'invoice_number', 'customer', 'payment_method', 'invoice_category', 'discount', 'total', 'status', 'created_at' ]
 
     # Return invoice number "#00125" or None 
     def get_invoice_number(self, obj):
@@ -23,3 +24,4 @@ class CustomerPurchasesSerializer(serializers.ModelSerializer):
         if invoice:
             return invoice.invoice_category
         return None
+    

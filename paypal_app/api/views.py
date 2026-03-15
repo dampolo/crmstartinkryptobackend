@@ -56,7 +56,7 @@ class CreateOrderView(views.APIView):
                 payment_method=PaymentMethod.PAYPAL
             )
 
-        paypal_order = create_paypal_order(pricing["total"])
+        paypal_order = create_paypal_order(purchase.total)
 
         purchase.paypal_order_id = paypal_order["id"]
         purchase.save(update_fields=["paypal_order_id"])
