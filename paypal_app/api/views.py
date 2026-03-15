@@ -19,6 +19,8 @@ from rest_framework import permissions
 
 # PAYPAL
 class CreateOrderView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
         course_id = request.data.get("course_id")
         discount_id = request.data.get("discount")
