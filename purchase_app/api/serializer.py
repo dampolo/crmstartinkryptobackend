@@ -8,8 +8,8 @@ class CustomerPurchasesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Purchase
-        fields = ['invoice_number', 'customer', 'payment_method', 'invoice_category', 'discount', 'total', 'status' ]
-        read_only_fields = ['invoice_number', 'customer', 'payment_method', 'invoice_category', 'discount', 'total', 'status' ]
+        fields = ['invoice_number', 'customer', 'payment_method', 'invoice_category', 'discount', 'total', 'status', 'created_at' ]
+        read_only_fields = ['invoice_number', 'customer', 'payment_method', 'invoice_category', 'discount', 'total', 'status', 'created_at' ]
 
     # Return invoice number "#00125" or None 
     def get_invoice_number(self, obj):

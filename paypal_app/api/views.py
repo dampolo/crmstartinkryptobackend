@@ -14,6 +14,7 @@ from django.db import transaction
 from purchase_app.services import SendInvoiceEmail
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from rest_framework import permissions
 
 
 # PAYPAL
@@ -23,26 +24,35 @@ class CreateOrderView(views.APIView):
         discount_id = request.data.get("discount")
         customer = request.user
 
-        # Prevent duplicate purchases
-        if Purchase.objects.filter(customer=customer, course=course_id).exists():
-            raise ValidationError(
-                {"message": _("You already purchased this course.")}
-            )
-
-        pricing = calculate_course_price(course_id, discount_id, customer)
-        purchase = Purchase.objects.create(
+        # Check existing purchase
+        purchase = Purchase.objects.filter(
             customer=customer,
-            course=pricing["course"],
-            discount=pricing["discount"],
-            status=PaymentStatus.UNPAID,
-            subtotal=pricing["subtotal"],
-            discount_percent=pricing["discount_percent"],
-            discount_amount=pricing["discount_amount"],
-            tax_percent=pricing["tax_percent"],
-            tax_amount=pricing["tax_amount"],
-            total=pricing["total"],
-            payment_method=PaymentMethod.PAYPAL
-        )
+            course_id=course_id
+        ).first()
+
+        # Prevent duplicate purchases
+        if purchase:
+
+            # If already paid → block
+            if purchase.status == PaymentStatus.PAID:
+                raise ValidationError(
+                    {"message": _("You already purchased this course.")}
+                )
+        else:
+            pricing = calculate_course_price(course_id, discount_id, customer)
+            purchase = Purchase.objects.create(
+                customer=customer,
+                course=pricing["course"],
+                discount=pricing["discount"],
+                status=PaymentStatus.UNPAID,
+                subtotal=pricing["subtotal"],
+                discount_percent=pricing["discount_percent"],
+                discount_amount=pricing["discount_amount"],
+                tax_percent=pricing["tax_percent"],
+                tax_amount=pricing["tax_amount"],
+                total=pricing["total"],
+                payment_method=PaymentMethod.PAYPAL
+            )
 
         paypal_order = create_paypal_order(pricing["total"])
 
@@ -174,3 +184,5 @@ class CaptureOrderView(views.APIView):
             "status": "success",
             "invoice_id": invoice.id
         })
+
+
