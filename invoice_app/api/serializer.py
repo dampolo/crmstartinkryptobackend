@@ -160,6 +160,7 @@ class TaxSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'percent', 'active']
         read_only_fields = ['id']
 
+# Customer can see all his invoices.
 class CustomerInvoiceSerializer(serializers.ModelSerializer):
     service_name = serializers.SerializerMethodField()
 
