@@ -40,9 +40,14 @@ class CourseFeatureViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 class LessonViewSetCrmAPI(viewsets.ModelViewSet):
-    queryset = Lesson.objects.all()
     serializer_class = LessonSerializerCrm
-    # permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        course = self.request.query_params.get('course')
+        return Lesson.objects.filter(
+            course=course,
+        )
+
 
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
