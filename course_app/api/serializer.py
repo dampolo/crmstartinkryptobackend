@@ -35,6 +35,27 @@ class LessonPDFSerializer(serializers.ModelSerializer):
         model = LessonPDF
         fields = ['id', 'title', 'file']
 
+class LessonSerializerCrm(serializers.ModelSerializer):
+    # pdfs works because of: related_name='pdfs'
+    pdfs = LessonPDFSerializer(
+        many= True, read_only= True
+        )
+
+    class Meta:
+        model = Lesson
+        fields = [
+            'id',
+            'course',
+            'title',
+            'description',
+            'video',
+            'description_under_video',
+            'order',
+            'status',
+            'duration',
+            'pdfs'
+        ]
+
 # If you bought course you can see all leassons from courses
 class LessonSerializer(serializers.ModelSerializer):
     # pdfs works because of: related_name='pdfs'
