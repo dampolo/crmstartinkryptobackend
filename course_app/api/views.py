@@ -66,7 +66,7 @@ class LessonViewSet(viewsets.ModelViewSet):
         ).exists()
 
         if not has_purchase:
-            raise PermissionDenied({"message": _("We have not received your payment.")})
+            raise PermissionDenied({'message': _('We have not received your payment.')})
 
         return Lesson.objects.filter(
             course_id=course_id,
@@ -107,21 +107,21 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
     serializer_class = DiscountCodeSerializer
     permission_classes = [AllowAny]
 
-    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def validate_code(self, request):
 
-        code = request.data.get("code")
+        code = request.data.get('code')
         try:
             discount = DiscountCode.objects.get(code=code, active=True)
         except DiscountCode.DoesNotExist:
             return Response(
-                {"detail": "Invalid discount code."},
+                {'detail': 'Invalid discount code.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         # If the code has an expiration date AND that date is already in the past
         if discount.expires_at and discount.expires_at < timezone.now():
             return Response(
-                {"detail": "Discount code expired."},
+                {'detail': 'Discount code expired.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         serializer = self.get_serializer(discount)
