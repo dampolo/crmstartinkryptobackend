@@ -101,7 +101,7 @@ class PurchasedSerializer(serializers.ModelSerializer):
     # get id from Course
     course_id = serializers.PrimaryKeyRelatedField(
         queryset=Course.objects.all(),
-        source="course",
+        source='course',
         write_only=True
     )
 
@@ -121,7 +121,7 @@ class PurchasedSerializer(serializers.ModelSerializer):
         fields = [
             'id', # id from purchased
             'course',
-            "course_id",
+            'course_id',
             'lessons_count',
             'discount',
             'total',
@@ -136,12 +136,12 @@ class DiscountCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiscountCode
         fields = [
-            "id",
-            "code",
-            "percent_value",
-            "active",
-            "expires_at",
-            "is_valid",
+            'id',
+            'code',
+            'percent_value',
+            'active',
+            'expires_at',
+            'is_valid',
         ]
 
     def get_is_valid(self, obj):
