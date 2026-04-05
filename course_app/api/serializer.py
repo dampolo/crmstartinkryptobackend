@@ -9,6 +9,7 @@ class CourseFeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseFeature
         fields = ['id', 'course', 'text', 'order']
+        read_only_fields = ['created_at', 'updated_at']
 
 
 # You can see all courses(not bought)
@@ -29,11 +30,14 @@ class CourseSerializer(serializers.ModelSerializer):
             'features',
             'status',
         ]
+        read_only_fields = ['created_at', 'updated_at']
 
 class LessonPDFSerializer(serializers.ModelSerializer):
     class Meta:
         model = LessonPDF
-        fields = ['id', 'title', 'file']
+        fields = ['id', 'title', 'file', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at']
+
 
 class LessonSerializerCrm(serializers.ModelSerializer):
     # pdfs works because of: related_name='pdfs'
@@ -55,6 +59,7 @@ class LessonSerializerCrm(serializers.ModelSerializer):
             'duration',
             'pdfs'
         ]
+        read_only_fields = ['created_at', 'updated_at']
 
 # If you bought course you can see all leassons from courses
 class LessonSerializer(serializers.ModelSerializer):
@@ -77,6 +82,7 @@ class LessonSerializer(serializers.ModelSerializer):
             'duration',
             'pdfs'
         ]
+        read_only_fields = ['created_at', 'updated_at']
 
 # Belong to PurchasedSerializer 'course'
 class PurchasedCourseSerializer(serializers.ModelSerializer):
@@ -90,6 +96,7 @@ class PurchasedCourseSerializer(serializers.ModelSerializer):
             'order',
             'language',
         ]
+        read_only_fields = ['created_at', 'updated_at']
 
 # Show all courses which you bought
 class PurchasedSerializer(serializers.ModelSerializer):
@@ -127,7 +134,7 @@ class PurchasedSerializer(serializers.ModelSerializer):
             'total',
             'created_at',
         ]
-        read_only_fields = ['created_at']
+        read_only_fields = ['created_at', 'updated_at']
 
 class DiscountCodeSerializer(serializers.ModelSerializer):
     # is_valid exists only in the API response
@@ -143,6 +150,7 @@ class DiscountCodeSerializer(serializers.ModelSerializer):
             'expires_at',
             'is_valid',
         ]
+        read_only_fields = ['created_at', 'updated_at']
 
     def get_is_valid(self, obj):
         if not obj.active:

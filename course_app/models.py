@@ -26,6 +26,8 @@ class DiscountCode(models.Model):
     percent_value = models.PositiveIntegerField(help_text="Rabatt % Wert")
     active = models.BooleanField(default=True)
     expires_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.code} ({self.percent_value}%)"
@@ -59,6 +61,8 @@ class Course(models.Model):
         choices=Status.choices,
         default=Status.DRAFT
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['order']
@@ -67,6 +71,8 @@ class Course(models.Model):
         return self.name
 
 # Short describtion of th coures in points
+
+
 class CourseFeature(models.Model):
     course = models.ForeignKey(
         Course,
@@ -76,6 +82,8 @@ class CourseFeature(models.Model):
     text = models.CharField(max_length=255)
     order = models.DecimalField(
         max_digits=4, decimal_places=2, null=False, blank=False, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['order']
@@ -93,7 +101,7 @@ class Lesson(models.Model):
     order = models.DecimalField(
         max_digits=4, decimal_places=2, null=False, blank=False, default=0)
     duration = models.PositiveIntegerField(null=True, blank=True)
-    
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # save file first
 
@@ -118,12 +126,14 @@ class Lesson(models.Model):
 
             self.duration = int(duration)
             super().save(update_fields=["duration"])
-            
+
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
         default=Status.DRAFT
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['order']
@@ -137,6 +147,8 @@ class LessonPDF(models.Model):
         Lesson, on_delete=models.CASCADE, related_name='pdfs')
     file = models.FileField(upload_to='lesson_pdfs/')
     title = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.title} für {self.lesson.title}"
