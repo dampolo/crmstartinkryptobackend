@@ -8,7 +8,7 @@ from django.utils import timezone
 class CourseFeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseFeature
-        fields = ['id', 'course', 'text', 'order']
+        fields = ['id', 'course', 'text', 'order','created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at']
 
 
@@ -29,6 +29,8 @@ class CourseSerializer(serializers.ModelSerializer):
             'badge',
             'features',
             'status',
+            'created_at', 
+            'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -57,7 +59,9 @@ class LessonSerializerCrm(serializers.ModelSerializer):
             'order',
             'status',
             'duration',
-            'pdfs'
+            'pdfs',
+            'created_at', 
+            'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -80,7 +84,9 @@ class LessonSerializer(serializers.ModelSerializer):
             'order',
             'status',
             'duration',
-            'pdfs'
+            'pdfs',
+            'created_at', 
+            'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -95,6 +101,8 @@ class PurchasedCourseSerializer(serializers.ModelSerializer):
             'image',
             'order',
             'language',
+            'created_at', 
+            'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -132,7 +140,8 @@ class PurchasedSerializer(serializers.ModelSerializer):
             'lessons_count',
             'discount',
             'total',
-            'created_at',
+            'created_at', 
+            'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -149,6 +158,8 @@ class DiscountCodeSerializer(serializers.ModelSerializer):
             'active',
             'expires_at',
             'is_valid',
+            'created_at',
+            'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
