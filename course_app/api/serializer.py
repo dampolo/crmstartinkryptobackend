@@ -47,6 +47,15 @@ class LessonPDFSerializer(serializers.ModelSerializer):
                   'updated_at', 'file_size', 'file_size_display']
         read_only_fields = ['created_at', 'updated_at',
                             'file_size', 'file_size_display']
+        
+    def validate_file(self, value):
+        max_size = 2 * 1024 * 1024  # 2 MB
+
+        if value.size > max_size:
+            raise serializers.ValidationError(
+                "File size must be max 2 MB"
+            )
+        return value
 
     def get_file_size(self, obj):
         return obj.file.size if obj.file else None
@@ -56,6 +65,8 @@ class LessonPDFSerializer(serializers.ModelSerializer):
             return None
 
         size = obj.file.size
+        
+        print(f'PDF: ',  obj)
 
         for unit in ['B', 'KB', 'MB', 'GB']:
             if size < 1024:
