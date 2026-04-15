@@ -47,7 +47,7 @@ class LessonPDFSerializer(serializers.ModelSerializer):
                   'updated_at', 'file_size', 'file_size_display']
         read_only_fields = ['created_at', 'updated_at',
                             'file_size', 'file_size_display']
-        
+
     def validate_file(self, value):
         max_size = 2 * 1024 * 1024  # 2 MB
 
@@ -65,7 +65,7 @@ class LessonPDFSerializer(serializers.ModelSerializer):
             return None
 
         size = obj.file.size
-        
+
         print(f'PDF: ',  obj)
 
         for unit in ['B', 'KB', 'MB', 'GB']:
@@ -98,13 +98,14 @@ class LessonSerializerCrm(serializers.ModelSerializer):
         ]
         read_only_fields = ['created_at', 'updated_at']
 
+
 # If you bought course you can see all leassons from courses
-
-
 class LessonSerializer(serializers.ModelSerializer):
     # pdfs works because of: related_name='pdfs'
+
     pdfs = LessonPDFSerializer(
-        many=True, read_only=True
+        write_only=True,
+        required=False
     )
 
     class Meta:
@@ -127,7 +128,6 @@ class LessonSerializer(serializers.ModelSerializer):
 
 # Belong to PurchasedSerializer 'course'
 
-
 class PurchasedCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
@@ -144,7 +144,6 @@ class PurchasedCourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 # Show all courses which you bought
-
 
 class PurchasedSerializer(serializers.ModelSerializer):
     lessons_count = serializers.IntegerField(read_only=True)
