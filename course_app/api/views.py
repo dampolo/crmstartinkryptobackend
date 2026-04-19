@@ -51,7 +51,6 @@ class LessonViewSetCrmAPI(viewsets.ModelViewSet):
 
 
 class LessonViewSet(viewsets.ModelViewSet):
-    queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [AllowAny]
 
@@ -64,10 +63,6 @@ class LessonViewSet(viewsets.ModelViewSet):
             customer=customer,
             course_id=course_id,
             status=PaymentStatus.PAID
-        ).exists()
-
-        has_published = Lesson.objects.filter(
-            status=Status.PUBLISHED
         ).exists()
 
         if not has_purchase:
