@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF
+from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, Status
 from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer, LessonPDFSerializer, LessonSerializerCrm
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -66,11 +66,16 @@ class LessonViewSet(viewsets.ModelViewSet):
             status=PaymentStatus.PAID
         ).exists()
 
+        has_published = Lesson.objects.filter(
+            status=Status.PUBLISHED
+        ).exists()
+
         if not has_purchase:
             raise PermissionDenied({'message': _('We have not received your payment.')})
 
         return Lesson.objects.filter(
             course_id=course_id,
+            status=Status.PUBLISHED
         )
 
 

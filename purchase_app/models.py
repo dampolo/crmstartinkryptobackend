@@ -61,6 +61,8 @@ class Purchase(models.Model):
     paypal_order_id = models.CharField(max_length=255, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return f"{self.customer.first_name}, {self.customer.last_name}"
