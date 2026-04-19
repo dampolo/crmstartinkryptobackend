@@ -7,7 +7,7 @@ from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer,
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from decimal import Decimal
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
 from decimal import ROUND_HALF_UP
 from django.db import transaction
@@ -81,18 +81,23 @@ class PurchasedViewSet(viewsets.ModelViewSet):
     serializer_class = PurchasedSerializer
     permission_classes = [IsAuthenticated]
 
-    # show you all courses which you bought
+    # show you all courses which you bought with filter "lessons_count"
     def get_queryset(self):
         return (
             super().get_queryset()
             .filter(customer=self.request.user)
-            .annotate(lessons_count=Count('course__lessons'))
+            .annotate(
+                lessons_count=Count(
+                    'course__lessons', 
+                    filter=Q(course__lessons__status=Status.PUBLISHED)
+                    )
+                )
         )
 
     # With this method you can buy a course
     def perform_create(self, serializer):
 
-        # class in purchase_app
+        # class in purchase_app --> services.py
         service = PurchaseService()
         service.create_purchase(
             request=self.request,
