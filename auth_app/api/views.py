@@ -120,7 +120,7 @@ class MeView(APIView):
         return Response({
             'id': request.user.id,
             'username': request.user.username,
-            'type': request.user.type
+            'role': request.user.role
         })
 
 
