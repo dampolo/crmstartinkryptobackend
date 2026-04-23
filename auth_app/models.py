@@ -36,7 +36,7 @@ class User(AbstractUser):
 
     working_hours = models.CharField(max_length=50, blank=True, default="")
 
-    type = models.CharField(
+    role = models.CharField(
         max_length=10,
         choices=ProfileType,
         default=ProfileType.CUSTOMER
