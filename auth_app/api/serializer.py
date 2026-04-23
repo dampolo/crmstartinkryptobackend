@@ -61,6 +61,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         if 'username' in self.fields:
             self.fields.pop('username')
+    
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add your custom claim here
+        token['role'] = user.role
+
+        return token
 
     def validate(self, attrs):
         email = attrs.get('email')
