@@ -99,7 +99,7 @@ class Invoice(models.Model):
         User,
         related_name="issued_invoices",
         on_delete=models.PROTECT,
-        limit_choices_to={'type': User.ProfileType.BUSINESS}
+        limit_choices_to={'role': User.ProfileType.BUSINESS}
     )
 
     # Receive the invoice
@@ -107,7 +107,7 @@ class Invoice(models.Model):
         User,
         related_name="received_invoices",
         on_delete=models.PROTECT,
-        limit_choices_to={'type': User.ProfileType.CUSTOMER}
+        limit_choices_to={'role': User.ProfileType.CUSTOMER}
     )
 
     # --- CUSTOMER SNAPSHOT ---

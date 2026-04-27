@@ -47,13 +47,13 @@ class InvoiceSerializer(serializers.ModelSerializer):
             # system fields
             'created_at', 'updated_at', 'is_finalized',
 
-            'notes_template'
-            'notes'
-            'payment_method'
-            'invoice_category'
+            'notes_template',
+            'notes',
+            'payment_method',
+            'invoice_category',
 
             # SERVICES LAST
-            'services'
+            'services',
         ]
 
         # Read-only fields: CANNOT be set by frontend
@@ -102,7 +102,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
         customer_id = validated_data.pop('customer')
         customer = User.objects.get(id=customer_id)
 
-        if current_user.type != User.ProfileType.BUSINESS:
+        if current_user.role != User.ProfileType.BUSINESS:
             raise serializers.ValidationError(
                 "Only business users can create invoices.")
 

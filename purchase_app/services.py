@@ -89,7 +89,7 @@ class PurchaseService:
             payment_method=PaymentMethod.BANK_TRANSFER
         )
 
-            business = User.objects.get(type=User.ProfileType.BUSINESS)
+            business = User.objects.get(role=User.ProfileType.BUSINESS)
 
             invoice = Invoice.objects.create(
                 business=business,
