@@ -21,7 +21,7 @@ class Purchase(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='purchases',
-        limit_choices_to={'type': User.ProfileType.CUSTOMER}
+        limit_choices_to={'role': User.ProfileType.CUSTOMER}
     )
 
 
