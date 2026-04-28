@@ -124,7 +124,7 @@ class CaptureOrderView(views.APIView):
 
         company = Company.objects.first()
 
-        business = User.objects.get(type=User.ProfileType.BUSINESS)
+        business = User.objects.get(role=User.ProfileType.BUSINESS)
         # 6 Create invoice
         invoice = Invoice.objects.create(
             business=business,
