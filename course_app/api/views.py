@@ -6,20 +6,9 @@ from course_app.models import Course, CourseFeature, Lesson, DiscountCode, Lesso
 from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer, LessonPDFSerializer, LessonSerializerCrm
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from decimal import Decimal
 from django.db.models import Count, Q
 from django.utils import timezone
-from decimal import ROUND_HALF_UP
-from django.db import transaction
-from company_app.models import Company
-from invoice_app.models import Invoice, InvoiceService, PriceType, Tax,PaymentStatus
-from invoice_app.invoice_number import GenerateInvoiceNumber
-from django.template.loader import render_to_string
-from weasyprint import HTML
-from django.http import HttpResponse
-from auth_app.models import User
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
+from invoice_app.models import PaymentStatus
 from purchase_app.models import Purchase
 from purchase_app.services import PurchaseService
 from django.utils.translation import gettext_lazy as _
