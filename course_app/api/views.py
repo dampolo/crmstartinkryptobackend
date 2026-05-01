@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, Status
@@ -65,7 +65,11 @@ class LessonViewSet(viewsets.ModelViewSet):
 
 # BUY BUY
 # If you bought the course, you will see it
-class PurchasedViewSet(viewsets.ModelViewSet):
+class PurchasedViewSet(
+    mixins.CreateModelMixin, 
+    mixins.ListModelMixin, 
+    viewsets.GenericViewSet
+    ):
     queryset = Purchase.objects.all()
     serializer_class = PurchasedSerializer
     permission_classes = [IsAuthenticated]
