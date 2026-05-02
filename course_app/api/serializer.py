@@ -3,11 +3,11 @@ from auth_app.models import User
 from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, Status
 from purchase_app.models import Purchase
 from django.utils import timezone
+import subprocess
+import json
 
 
 # You can see all features from course, belong to CourseSerializer
-
-
 class CourseFeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseFeature
@@ -98,6 +98,45 @@ class LessonSerializerCrm(serializers.ModelSerializer):
             'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
+    
+    def set_duration(self, lesson):
+        video = lesson.video
+        if not video:
+            return
+
+        try:
+            result = subprocess.run(
+                [
+                    "ffprobe",
+                    "-v", "error",
+                    "-select_streams", "v:0",
+                    "-show_entries", "format=duration",
+                    "-of", "json",
+                    video.path,
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            output = json.loads(result.stdout)
+            lesson.duration = int(float(output["format"]["duration"]))
+            lesson.save(update_fields=["duration"])
+        except Exception:
+        # log this in real apps
+            pass
+
+    def create(self, validated_data):
+        lesson = super().create(validated_data)
+        self.set_duration(lesson)
+        return lesson
+
+    def update(self, instance, validated_data):
+        lesson = super().update(instance, validated_data)
+
+        if "video" in validated_data:
+            self.set_duration(lesson)
+
+        return lesson
 
 
 # If you bought course you can see all leassons from courses
@@ -128,7 +167,6 @@ class LessonSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 # Belong to PurchasedSerializer 'course'
-
 class PurchasedCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course

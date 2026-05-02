@@ -100,33 +100,7 @@ class Lesson(models.Model):
     description_under_video = models.TextField(blank=True)
     order = models.DecimalField(
         max_digits=4, decimal_places=2, null=False, blank=False, default=0)
-    duration = models.PositiveIntegerField(null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # save file first
-
-        if self.video and not self.duration:
-            video_path = self.video.path
-
-            result = subprocess.run(
-                [
-                    "ffprobe",
-                    "-v", "error",
-                    "-select_streams", "v:0",
-                    "-show_entries", "format=duration",
-                    "-of", "json",
-                    video_path,
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-
-            output = json.loads(result.stdout)
-            duration = float(output["format"]["duration"])
-
-            self.duration = int(duration)
-            super().save(update_fields=["duration"])
-
+    duration = models.PositiveIntegerField(null=False, blank=False)
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
