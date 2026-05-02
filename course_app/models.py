@@ -3,6 +3,9 @@ from auth_app.models import User
 from django.utils.translation import gettext_lazy as _
 from invoice_app.models import Invoice
 
+from django.utils.timezone import now
+
+
 import subprocess
 import json
 from django.db import models
@@ -101,6 +104,7 @@ class Lesson(models.Model):
     order = models.DecimalField(
         max_digits=4, decimal_places=2, null=False, blank=False, default=0)
     duration = models.PositiveIntegerField(null=False, blank=False)
+
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
