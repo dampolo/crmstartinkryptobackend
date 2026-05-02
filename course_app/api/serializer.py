@@ -98,7 +98,7 @@ class LessonSerializerCrm(serializers.ModelSerializer):
             'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
-    
+
     def set_duration(self, lesson):
         video = lesson.video
         if not video:
@@ -122,7 +122,7 @@ class LessonSerializerCrm(serializers.ModelSerializer):
             lesson.duration = int(float(output["format"]["duration"]))
             lesson.save(update_fields=["duration"])
         except Exception:
-        # log this in real apps
+            # log this in real apps
             pass
 
     def create(self, validated_data):
@@ -131,9 +131,14 @@ class LessonSerializerCrm(serializers.ModelSerializer):
         return lesson
 
     def update(self, instance, validated_data):
+        # Check if video is being removed
+        if "video" in validated_data and validated_data["video"] is None:
+            if instance.video:
+                instance.video.delete(save=False)  #deletes file from storage
+
         lesson = super().update(instance, validated_data)
 
-        if "video" in validated_data:
+        if "video" in validated_data and lesson.video:
             self.set_duration(lesson)
 
         return lesson
@@ -167,6 +172,8 @@ class LessonSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 # Belong to PurchasedSerializer 'course'
+
+
 class PurchasedCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
@@ -183,6 +190,7 @@ class PurchasedCourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 # Show all courses which you bought
+
 
 class PurchasedSerializer(serializers.ModelSerializer):
     lessons_count = serializers.IntegerField(read_only=True)
