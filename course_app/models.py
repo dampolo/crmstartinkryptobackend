@@ -1,13 +1,8 @@
 from django.db import models
-from auth_app.models import User
 from django.utils.translation import gettext_lazy as _
-from invoice_app.models import Invoice
 
 from django.utils.timezone import now
 
-
-import subprocess
-import json
 from django.db import models
 
 
