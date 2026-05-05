@@ -32,11 +32,15 @@ class RegistrationView(APIView):
         data = {}
         if serializer.is_valid():
             saved_account = serializer.save()
+            saved_account.is_active = False
+            saved_account.save() 
+            EmailService.confirm_your_email(saved_account, request)
+
             data = {
                 'username': saved_account.username,
                 'email': saved_account.email,
                 'user_id': saved_account.pk,
-                'customer_number': saved_account.customer_number
+                'customer_number': saved_account.customer_number,
             }
             return Response(data)
         else:
@@ -201,3 +205,66 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 @method_decorator(csrf_exempt, name="dispatch")
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
+
+
+class EmailService():
+    
+    @staticmethod
+    def confirm_your_email(user, request):
+        token = PasswordResetTokenGenerator().make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        active_link = f"{settings.DEFAULT_API}verify-email/{uid}/{token}"
+
+        html_content= render_to_string(
+            'templates/confirm_your_email.html',
+            {
+                'active_link': active_link
+            }
+        )
+
+        email_message = EmailMessage(
+            subject='Bestätige deine E-Mail',
+            body=html_content,
+            from_email=f"Start in Krypto <{settings.DEFAULT_FROM_EMAIL}>",
+            to=[user.email],
+        )
+
+        email_message.content_subtype = 'html'
+        email_message.send()
+
+        return Response({'message': 'Email confirmation link sent'})
+
+class VerifyEmailView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (User.DoesNotExist, ValueError, TypeError):
+
+            return Response(
+                {"error": "Invalid verification link"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not PasswordResetTokenGenerator().check_token(user, token):
+            return Response(
+                {"error": "Verification link is invalid or expired"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if user.is_active:
+            return Response(
+                {"message": "Account already verified"},
+                status=status.HTTP_200_OK
+            )
+
+        user.is_active = True
+        user.save(update_fields=["is_active"])
+
+        return Response(
+            {"message": "Email successfully verified"},
+            status=status.HTTP_200_OK
+        )
