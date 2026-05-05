@@ -44,6 +44,19 @@ class User(AbstractUser):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+
+        # 1. Erst speichern → damit ID existiert
+        super().save(*args, **kwargs)
+
+        # 2. Nur beim ersten Speichern customer_number setzen
+        if is_new and not self.customer_number:
+            self.customer_number = f"SK{self.id:06d}"
+
+            # 3. Nur dieses Feld updaten
+            super().save(update_fields=["customer_number"])
     
     def __str__(self):
         return f"{self.username} {self.first_name}"

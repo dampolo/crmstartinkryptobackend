@@ -12,7 +12,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'repeated_password', 'type']
+        fields = ['email', 'password', 'repeated_password', 'role']
         extra_kwargs = {
             'password': {
                 'write_only': True
@@ -33,16 +33,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
         password = validated_data['password']
         validated_data.pop('repeated_password')
 
-        user_type = validated_data.get('type')
-
         user = User(
             email=validated_data['email'],
             username=validated_data['email'],
-            type=user_type
+            role=validated_data['role']
         )
-
-        if user_type == User.ProfileType.CUSTOMER:
-            user.customer_number = GenerateCustomerNumber.generate_customer_number()
 
         user.set_password(password)
         user.save()
@@ -66,7 +61,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-        # Add your custom claim here
+        # Overwrite the token
         token['role'] = user.role
 
         return token
