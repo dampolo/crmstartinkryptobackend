@@ -12,6 +12,7 @@ from invoice_app.models import PaymentStatus
 from purchase_app.models import Purchase
 from purchase_app.services import PurchaseService
 from django.utils.translation import gettext_lazy as _
+from customer_app.api.views import IsProfileComplete
 
 # You can see all courses which you can buy
 # Admin can create, update change the course
@@ -90,6 +91,9 @@ class PurchasedViewSet(
     # With this method you can buy a course
     def perform_create(self, serializer):
 
+        # Check if the user compliede his profile
+        IsProfileComplete.is_profile_complete(self.request.user)
+        
         # class in purchase_app --> services.py
         service = PurchaseService()
         service.create_purchase(

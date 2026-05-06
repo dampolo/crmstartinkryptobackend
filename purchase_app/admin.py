@@ -9,3 +9,5 @@ class PurchaseAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Purchase, PurchaseAdmin)
+
+

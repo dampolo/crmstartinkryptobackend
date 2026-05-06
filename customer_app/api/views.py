@@ -6,7 +6,7 @@ from invoice_app.models import Invoice
 from invoice_app.api import serializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics 
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 
 
 class CustomerView(ModelViewSet):
@@ -37,7 +37,9 @@ class CustomerCommentDetail(generics.RetrieveUpdateAPIView):
 
 # If profile is not complete, Customer cannot buy a course
 class IsProfileComplete:
-    def is_profile_complete(self, request, customer):
+
+    @staticmethod
+    def is_profile_complete(customer):
 
         required_fields = [
             "first_name",
