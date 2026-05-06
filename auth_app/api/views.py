@@ -260,7 +260,7 @@ class VerifyEmailView(APIView):
                 {"message": "Account already verified"},
                 status=status.HTTP_200_OK
             )
-
+        print("TOKEN VALID, ACTIVATING USER")
         user.is_active = True
         user.save(update_fields=["is_active"])
 
