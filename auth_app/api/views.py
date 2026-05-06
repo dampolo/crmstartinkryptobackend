@@ -212,9 +212,9 @@ class EmailService():
     @staticmethod
     def confirm_your_email(user, request):
         token = PasswordResetTokenGenerator().make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
 
-        active_link = f"{settings.DEFAULT_API}verify-email/{uid}/{token}"
+        active_link = f"{settings.DEFAULT_API}kurse/verify-email/{uidb64}/{token}"
 
         html_content= render_to_string(
             'templates/confirm_your_email.html',
