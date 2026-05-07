@@ -16,10 +16,6 @@ from django.utils.translation import gettext_lazy as _
 class PurchaseService:
     def create_purchase(self, request, customer, course, discount):
         
-        # This Method check if profile form User is complete
-        is_profile_complete = IsProfileComplete()
-        is_profile_complete.is_profile_complete(request, customer)
-
         # Prevent duplicate purchases
         if Purchase.objects.filter(customer=customer, course=course).exists():
             raise ValidationError(

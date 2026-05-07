@@ -24,10 +24,13 @@ class CourseViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 # You can see all features from course, belong to CourseViewSet
+
+
 class CourseFeatureViewSet(viewsets.ModelViewSet):
     queryset = CourseFeature.objects.all()
     serializer_class = CourseFeatureSerializer
     permission_classes = [AllowAny]
+
 
 class LessonViewSetCrmAPI(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
@@ -56,7 +59,8 @@ class LessonViewSet(viewsets.ModelViewSet):
         ).exists()
 
         if not has_purchase:
-            raise PermissionDenied({'message': _('We have not received your payment.')})
+            raise PermissionDenied(
+                {'message': _('We have not received your payment.')})
 
         return Lesson.objects.filter(
             course_id=course_id,
@@ -67,10 +71,10 @@ class LessonViewSet(viewsets.ModelViewSet):
 # BUY BUY
 # If you bought the course, you will see it
 class PurchasedViewSet(
-    mixins.CreateModelMixin, 
-    mixins.ListModelMixin, 
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
     viewsets.GenericViewSet
-    ):
+):
     queryset = Purchase.objects.all()
     serializer_class = PurchasedSerializer
     permission_classes = [IsAuthenticated]
@@ -82,18 +86,24 @@ class PurchasedViewSet(
             .filter(customer=self.request.user)
             .annotate(
                 lessons_count=Count(
-                    'course__lessons', 
+                    'course__lessons',
                     filter=Q(course__lessons__status=Status.PUBLISHED)
-                    )
                 )
+            )
         )
 
     # With this method you can buy a course
     def perform_create(self, serializer):
 
-        # Check if the user compliede his profile
+        # This Method check if profile form User is complete
         IsProfileComplete.is_profile_complete(self.request.user)
-        
+
+        # Prevent duplicate purchases
+        if Purchase.objects.filter(customer=self.request.user, course=serializer.validated_data['course']).exists():
+            return Response(
+                {"message": _("You already purchased this course.")}, status=status.HTTP_400_BAD_REQUEST
+            )
+
         # class in purchase_app --> services.py
         service = PurchaseService()
         service.create_purchase(
@@ -104,6 +114,7 @@ class PurchasedViewSet(
         )
 
 #
+
 
 class DiscountCodeViewSet(viewsets.ModelViewSet):
     queryset = DiscountCode.objects.all()
