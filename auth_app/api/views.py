@@ -21,7 +21,7 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth import logout
-
+from customer_app.api.views import IsProfileComplete
 
 class RegistrationView(APIView):
     permission_classes = [AllowAny]
@@ -266,5 +266,18 @@ class VerifyEmailView(APIView):
 
         return Response(
             {"message": "Email successfully verified"},
+            status=status.HTTP_200_OK
+        )
+    
+
+class ProfileCompleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        IsProfileComplete.is_profile_complete(request.user)
+
+        return Response(
+            {"message": "Profil vollständig"},
             status=status.HTTP_200_OK
         )
