@@ -15,12 +15,6 @@ from django.utils.translation import gettext_lazy as _
 # For Bank Transfer
 class PurchaseService:
     def create_purchase(self, request, customer, course, discount):
-        
-        # Prevent duplicate purchases
-        if Purchase.objects.filter(customer=customer, course=course).exists():
-            raise ValidationError(
-        {"message": _("You already purchased this course.")}
-    )
 
         net_price = course.price
         tax = Tax.objects.first()
