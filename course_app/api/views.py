@@ -13,6 +13,7 @@ from purchase_app.models import Purchase
 from purchase_app.services import PurchaseService
 from django.utils.translation import gettext_lazy as _
 from customer_app.api.views import IsProfileComplete
+from rest_framework.exceptions import ValidationError
 
 # You can see all courses which you can buy
 # Admin can create, update change the course
@@ -100,8 +101,8 @@ class PurchasedViewSet(
 
         # Prevent duplicate purchases
         if Purchase.objects.filter(customer=self.request.user, course=serializer.validated_data['course']).exists():
-            return Response(
-                {"message": _("You already purchased this course.")}, status=status.HTTP_400_BAD_REQUEST
+            raise ValidationError(
+                {"message": _("You already purchased this course.")}
             )
 
         # class in purchase_app --> services.py
@@ -145,3 +146,4 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
 class LessonPDFViewSet(viewsets.ModelViewSet):
     queryset = LessonPDF.objects.all()
     serializer_class = LessonPDFSerializer
+

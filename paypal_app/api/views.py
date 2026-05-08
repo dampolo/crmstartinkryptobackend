@@ -26,35 +26,21 @@ class CreateOrderView(views.APIView):
         discount_id = request.data.get("discount")
         customer = request.user
 
-        # Check existing purchase
-        purchase = Purchase.objects.filter(
+       
+        pricing = calculate_course_price(course_id, discount_id, customer)
+        purchase = Purchase.objects.create(
             customer=customer,
-            course_id=course_id
-        ).first()
-
-        # Prevent duplicate purchases
-        if purchase:
-
-            # If already paid → block
-            if purchase.status == PaymentStatus.PAID:
-                raise ValidationError(
-                    {"message": _("You already purchased this course.")}
-                )
-        else:
-            pricing = calculate_course_price(course_id, discount_id, customer)
-            purchase = Purchase.objects.create(
-                customer=customer,
-                course=pricing["course"],
-                discount=pricing["discount"],
-                status=PaymentStatus.UNPAID,
-                subtotal=pricing["subtotal"],
-                discount_percent=pricing["discount_percent"],
-                discount_amount=pricing["discount_amount"],
-                tax_percent=pricing["tax_percent"],
-                tax_amount=pricing["tax_amount"],
-                total=pricing["total"],
-                payment_method=PaymentMethod.PAYPAL
-            )
+            course=pricing["course"],
+            discount=pricing["discount"],
+            status=PaymentStatus.UNPAID,
+            subtotal=pricing["subtotal"],
+            discount_percent=pricing["discount_percent"],
+            discount_amount=pricing["discount_amount"],
+            tax_percent=pricing["tax_percent"],
+            tax_amount=pricing["tax_amount"],
+            total=pricing["total"],
+            payment_method=PaymentMethod.PAYPAL
+        )
 
         paypal_order = create_paypal_order(purchase.total)
 
@@ -186,5 +172,3 @@ class CaptureOrderView(views.APIView):
             "status": "success",
             "invoice_id": invoice.id
         })
-
-

@@ -11,6 +11,9 @@ from auth_app.models import User
 from django.template.loader import render_to_string
 from purchase_app.models import Purchase
 from django.utils.translation import gettext_lazy as _
+from rest_framework.response import Response
+from rest_framework import status
+
 
 # For Bank Transfer
 class PurchaseService:
@@ -194,3 +197,21 @@ class SendInvoiceEmail:
 
         confirmation_message.content_subtype = "html"
         confirmation_message.send()
+
+
+class CheckPurchase:
+    @staticmethod
+    def check_purchase(customer, course_id):
+
+        purchase = Purchase.objects.filter(
+            customer=customer,
+            course_id=course_id
+        ).first()
+
+        if purchase:
+            return Response(
+                {
+                    'message': _('You already purchased this course.'),
+                },
+                 status=status.HTTP_409_CONFLICT
+            )
