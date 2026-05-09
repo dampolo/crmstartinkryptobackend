@@ -93,17 +93,8 @@ class PurchasedViewSet(
             )
         )
 
-    # With this method you can buy a course
+    # With this method you can buy a course with bank transfer
     def perform_create(self, serializer):
-
-        # This Method check if profile form User is complete
-        IsProfileComplete.is_profile_complete(self.request.user)
-
-        # Prevent duplicate purchases
-        if Purchase.objects.filter(customer=self.request.user, course=serializer.validated_data['course']).exists():
-            raise ValidationError(
-                {"message": _("You already purchased this course.")}
-            )
 
         # class in purchase_app --> services.py
         service = PurchaseService()
