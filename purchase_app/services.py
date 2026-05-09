@@ -199,6 +199,8 @@ class SendInvoiceEmail:
         confirmation_message.send()
 
 
+# This method check if the customer already bought a curse
+# The customer can only once buy a curse.
 class CheckPurchase:
     @staticmethod
     def check_purchase(customer, course_id):
