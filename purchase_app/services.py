@@ -64,7 +64,7 @@ class PurchaseService:
         company = Company.objects.first()
 
         # -------------------------
-        # DATABASE TRANSACTION
+        # Create of the order - purchase
         # -------------------------
         with transaction.atomic():
 
