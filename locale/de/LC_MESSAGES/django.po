@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-01 00:18+0100\n"
+"POT-Creation-Date: 2026-05-10 21:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,23 +42,31 @@ msgstr ""
 msgid "Divers"
 msgstr ""
 
-#: .\course_app\api\views.py:60
+#: .\course_app\api\views.py:63
 msgid "We have not received your payment."
 msgstr "Wir haben deine Zahlung noch nicht bekommen."
 
-#: .\course_app\models.py:8
+#: .\course_app\api\views.py:123
+msgid "Invalid discount code."
+msgstr "Ungültiger Gutschein."
+
+#: .\course_app\api\views.py:129
+msgid "Discount code expired."
+msgstr "Gutschein is abgelaufen."
+
+#: .\course_app\models.py:10
 msgid "Draft"
 msgstr ""
 
-#: .\course_app\models.py:9
+#: .\course_app\models.py:11
 msgid "Published"
 msgstr ""
 
-#: .\course_app\models.py:13
+#: .\course_app\models.py:15
 msgid "Deutsch"
 msgstr ""
 
-#: .\course_app\models.py:14
+#: .\course_app\models.py:16
 msgid "Polnisch"
 msgstr ""
 
@@ -1300,38 +1308,54 @@ msgstr ""
 msgid "Percentage (%)"
 msgstr ""
 
-#: .\invoice_app\models.py:46
+#: .\invoice_app\models.py:13
+msgid "PayPal"
+msgstr ""
+
+#: .\invoice_app\models.py:14
+msgid "Bank Transfer"
+msgstr ""
+
+#: .\invoice_app\models.py:15
+msgid "Cash"
+msgstr ""
+
+#: .\invoice_app\models.py:16
+msgid "payU"
+msgstr ""
+
+#: .\invoice_app\models.py:19
+msgid "Course"
+msgstr ""
+
+#: .\invoice_app\models.py:20
+msgid "Service"
+msgstr ""
+
+#: .\invoice_app\models.py:60
 msgid "Invoice"
 msgstr ""
 
-#: .\invoice_app\models.py:47
+#: .\invoice_app\models.py:61
 msgid "Credit Note"
 msgstr ""
 
-#: .\invoice_app\models.py:50
+#: .\invoice_app\models.py:64
 msgid "Pending"
 msgstr ""
 
-#: .\invoice_app\models.py:51
+#: .\invoice_app\models.py:65
 msgid "Unpaid"
 msgstr ""
 
-#: .\invoice_app\models.py:52 .\purchase_app\models.py:14
+#: .\invoice_app\models.py:66
 msgid "Paid"
 msgstr ""
 
-#: .\invoice_app\models.py:53 .\purchase_app\models.py:16
+#: .\invoice_app\models.py:67
 msgid "Canceled"
 msgstr ""
 
-#: .\paypal_app\api\views.py:29 .\purchase_app\services.py:25
+#: .\purchase_app\services.py:216
 msgid "You already purchased this course."
 msgstr "Du hast schon den Kurs gekauft."
-
-#: .\purchase_app\models.py:13
-msgid "Open"
-msgstr ""
-
-#: .\purchase_app\models.py:15
-msgid "Failed"
-msgstr ""

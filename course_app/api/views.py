@@ -120,13 +120,13 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
             discount = DiscountCode.objects.get(code=code, active=True)
         except DiscountCode.DoesNotExist:
             return Response(
-                {'message': 'Invalid discount code.'},
+                {'message': _('Invalid discount code.')},
                 status=status.HTTP_404_NOT_FOUND
             )
         # If the code has an expiration date AND that date is already in the past
         if discount.expires_at and discount.expires_at < timezone.now():
             return Response(
-                {'message': 'Discount code expired.'},
+                {'message': _('Discount code expired.')},
                 status=status.HTTP_406_NOT_ACCEPTABLE
             )
         serializer = self.get_serializer(discount)
