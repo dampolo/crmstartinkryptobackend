@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, Status
 from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer, LessonPDFSerializer, LessonSerializerCrm
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -12,8 +12,7 @@ from invoice_app.models import PaymentStatus
 from purchase_app.models import Purchase
 from purchase_app.services import PurchaseService
 from django.utils.translation import gettext_lazy as _
-from customer_app.api.views import IsProfileComplete
-from rest_framework.exceptions import ValidationError
+from auth_app.permissions import DiscountCodePermission
 
 # You can see all courses which you can buy
 # Admin can create, update change the course
@@ -111,9 +110,9 @@ class PurchasedViewSet(
 class DiscountCodeViewSet(viewsets.ModelViewSet):
     queryset = DiscountCode.objects.all()
     serializer_class = DiscountCodeSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [DiscountCodePermission]
 
-    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['post'])
     def validate_code(self, request):
 
         code = request.data.get('code')
@@ -121,14 +120,14 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
             discount = DiscountCode.objects.get(code=code, active=True)
         except DiscountCode.DoesNotExist:
             return Response(
-                {'detail': 'Invalid discount code.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {'message': 'Invalid discount code.'},
+                status=status.HTTP_404_NOT_FOUND
             )
         # If the code has an expiration date AND that date is already in the past
         if discount.expires_at and discount.expires_at < timezone.now():
             return Response(
-                {'detail': 'Discount code expired.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {'message': 'Discount code expired.'},
+                status=status.HTTP_406_NOT_ACCEPTABLE
             )
         serializer = self.get_serializer(discount)
         return Response(serializer.data)
