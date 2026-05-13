@@ -148,10 +148,7 @@ class LessonSerializerCrm(serializers.ModelSerializer):
 class LessonSerializer(serializers.ModelSerializer):
     # pdfs works because of: related_name='pdfs'
 
-    pdfs = LessonPDFSerializer(
-        write_only=True,
-        required=False
-    )
+    pdfs = LessonPDFSerializer(read_only=True, many=True)
 
     class Meta:
         model = Lesson
