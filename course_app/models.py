@@ -123,5 +123,11 @@ class LessonPDF(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def delete(self, *args, **kwargs):
+        if self.file:
+            self.file.delete(save=True)
+        super().delete(*args, **kwargs)
+    
+
     def __str__(self):
         return f"{self.title} für {self.lesson.title}"
