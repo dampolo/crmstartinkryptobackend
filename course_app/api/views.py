@@ -134,5 +134,5 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
 class LessonPDFViewSet(viewsets.ModelViewSet):
     queryset = LessonPDF.objects.all()
     serializer_class = LessonPDFSerializer
-    permission_classes =[IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
