@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, Status
 from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer, LessonPDFSerializer, LessonSerializerCrm
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -16,25 +16,23 @@ from auth_app.permissions import DiscountCodePermission
 
 # You can see all courses which you can buy
 # Admin can create, update change the course
-
-
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [AllowAny]
 
+
 # You can see all features from course, belong to CourseViewSet
-
-
 class CourseFeatureViewSet(viewsets.ModelViewSet):
     queryset = CourseFeature.objects.all()
     serializer_class = CourseFeatureSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
 
 class LessonViewSetCrmAPI(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializerCrm
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         course = self.request.query_params.get('course')
@@ -45,7 +43,7 @@ class LessonViewSetCrmAPI(viewsets.ModelViewSet):
 
 class LessonViewSet(viewsets.ModelViewSet):
     serializer_class = LessonSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     # Show all lessons which you bought
     def get_queryset(self):
@@ -136,4 +134,5 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
 class LessonPDFViewSet(viewsets.ModelViewSet):
     queryset = LessonPDF.objects.all()
     serializer_class = LessonPDFSerializer
+    permission_classes =[IsAuthenticated]
 

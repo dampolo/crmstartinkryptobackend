@@ -128,6 +128,5 @@ class LessonPDF(models.Model):
             self.file.delete(save=True)
         super().delete(*args, **kwargs)
     
-
     def __str__(self):
         return f"{self.title} für {self.lesson.title}"
