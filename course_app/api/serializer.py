@@ -18,6 +18,8 @@ class CourseFeatureSerializer(serializers.ModelSerializer):
 # You can see all courses(not bought)
 class CourseSerializer(serializers.ModelSerializer):
     features = CourseFeatureSerializer(many=True, read_only=True)
+    # SerializerMethodField is read only field
+    badge_help_text = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -30,12 +32,16 @@ class CourseSerializer(serializers.ModelSerializer):
             'image',
             'order',
             'badge',
+            'badge_help_text',
             'features',
             'status',
             'created_at',
             'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
+
+    def get_badge_help_text(self, obj):
+        return obj._meta.get_field('badge').help_text
 
 
 class LessonPDFSerializer(serializers.ModelSerializer):
