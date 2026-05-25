@@ -266,14 +266,9 @@ class LessonProgressSerializer(serializers.Serializer):
     )
     watched_seconds = serializers.IntegerField(min_value=0)
 
-    def validate_lesson_id(self, value):
-        if not Lesson.objects.filter(id=value).exists():
-            raise serializers.ValidationError("Lesson does not exist")
-        return value
-
     def save(self, **kwargs):
         user = self.context["request"].user
-        lesson = Lesson.objects.get(id=self.validated_data["lesson"])
+        lesson = self.validated_data["lesson"]
         watched_seconds = self.validated_data["watched_seconds"]
         progress, created = LessonProgress.objects.get_or_create(
             user=user,
