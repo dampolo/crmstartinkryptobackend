@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from auth_app.models import User
-from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, Status
+from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, LessonProgress
 from purchase_app.models import Purchase
 from django.utils import timezone
 import subprocess
@@ -259,3 +259,37 @@ class DiscountCodeSerializer(serializers.ModelSerializer):
         if obj.expires_at and obj.expires_at < timezone.now():
             return False
         return True
+
+class LessonProgressSerializer(serializers.Serializer):
+    lesson = serializers.PrimaryKeyRelatedField(
+        queryset=Lesson.objects.all()
+    )
+    watched_seconds = serializers.IntegerField(min_value=0)
+
+    def validate_lesson_id(self, value):
+        if not Lesson.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Lesson does not exist")
+        return value
+
+    def save(self, **kwargs):
+        user = self.context["request"].user
+        lesson = Lesson.objects.get(id=self.validated_data["lesson"])
+        watched_seconds = self.validated_data["watched_seconds"]
+        progress, created = LessonProgress.objects.get_or_create(
+            user=user,
+            lesson=lesson,
+            defaults={"watched_seconds": 0}
+        )
+
+        # Never decrease progress
+        progress.watched_seconds = max(
+            progress.watched_seconds,
+            watched_seconds
+        )
+        
+        more_than_95 = lesson.duration_seconds * 0.95
+
+        if progress.watched_seconds >= more_than_95:
+            progress.completed = True
+        progress.save()
+        return progress

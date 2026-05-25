@@ -146,3 +146,5 @@ class LessonProgress(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.lesson}"
+
+

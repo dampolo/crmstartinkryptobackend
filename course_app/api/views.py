@@ -1,9 +1,9 @@
 from rest_framework import status
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, views
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, Status
-from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer, LessonPDFSerializer, LessonSerializerCrm
+from course_app.models import Course, CourseFeature, Lesson, DiscountCode, LessonPDF, Status, LessonProgress
+from course_app.api.serializer import CourseSerializer, CourseFeatureSerializer, LessonSerializer, PurchasedSerializer, DiscountCodeSerializer, LessonPDFSerializer, LessonSerializerCrm, LessonProgressSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied
 from django.db.models import Count, Q
@@ -136,3 +136,40 @@ class LessonPDFViewSet(viewsets.ModelViewSet):
     serializer_class = LessonPDFSerializer
     permission_classes = [IsAdminUser]
 
+class LessonProgressAPIView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = LessonProgressSerializer(
+            data=request.data,
+            context={"request": request}
+        )
+
+        serializer.is_valid(raise_exception=True)
+        progress = serializer.save()
+
+        return Response(
+            {
+                "lesson": progress.lesson.id,
+                "watched_seconds": progress.watched_seconds,
+                "completed": progress.completed,
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+    def get(self, request, lesson_id):
+        progress = LessonProgress.objects.filter(
+            user=request.user,
+            lesson_id=lesson_id
+        ).first()
+
+
+        return Response(
+            {
+                "watched_seconds": progress.watched_seconds if progress else 0,
+                "completed": progress.completed if progress else False,
+            }
+        )
+
+ 
