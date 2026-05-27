@@ -155,6 +155,7 @@ class LessonSerializer(serializers.ModelSerializer):
     # pdfs works because of: related_name='pdfs'
 
     pdfs = LessonPDFSerializer(read_only=True, many=True)
+    progress = serializers.SerializerMethodField()
 
     class Meta:
         model = Lesson
@@ -170,13 +171,27 @@ class LessonSerializer(serializers.ModelSerializer):
             'duration',
             'pdfs',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'progress'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
+    def get_progress(self, obj):
+        user = self.context['request'].user
+
+        progress = LessonProgress.objects.filter(
+            user=user,
+            lesson=obj
+        ).first()
+
+        if not progress:
+            return {
+                'watched_seconds': 0,
+                'completed': False
+            }
+        return LessonProgressReadSerializer(progress).data
+
 # Belong to PurchasedSerializer 'course'
-
-
 class PurchasedCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
@@ -288,3 +303,11 @@ class LessonProgressSerializer(serializers.Serializer):
             progress.completed = True
         progress.save()
         return progress
+    
+class LessonProgressReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LessonProgress
+        fields = [
+            "watched_seconds",
+            "completed"
+        ]
