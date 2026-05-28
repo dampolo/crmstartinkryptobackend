@@ -297,7 +297,7 @@ class LessonProgressSerializer(serializers.Serializer):
             watched_seconds
         )
         
-        more_than_95 = lesson.duration_seconds * 0.95
+        more_than_95 = lesson.duration * 0.95
 
         if progress.watched_seconds >= more_than_95:
             progress.completed = True
