@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from auth_app.models import User
 from invoice_app.models import Invoice
 
-class DashboardAPIView(APIView):
+class DashboardCrmAPIView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):

@@ -30,7 +30,7 @@ urlpatterns = [
     path('api/', include('course_app.api.urls')),
     path('api/', include('paypal_app.api.urls')),
     path('api/', include('purchase_app.api.urls')),
-
+    path('api/', include('dashboard_app.api.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

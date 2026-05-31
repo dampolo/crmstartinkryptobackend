@@ -72,7 +72,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'course_app',
     'paypal_app',
-    'purchase_app'
+    'purchase_app',
+    'dashboard_app'
 ]
 
 MIDDLEWARE = [
