@@ -18,7 +18,7 @@ class DashboardCrmAPIView(APIView):
                 'email',
                 'has_portfolio',
             )
-        ),
+        )
         latest_invoices = (
             Invoice.objects
             .order_by('-updated_at')[:3]
@@ -30,10 +30,20 @@ class DashboardCrmAPIView(APIView):
                 'amount'
             )
         )
+        latest_applicants = (
+            User.objects
+            .filter(role=User.ProfileType.APPLICANT)
+            .order_by('-updated_at')[:3]
+            .values(
+                'first_name',
+                'last_name'
+            )
+        )
         return Response({
             'customers_count': User.objects.filter(role=User.ProfileType.CUSTOMER).count(),
             'applicants_count': User.objects.filter(role=User.ProfileType.APPLICANT).count(),
             'invioces_count': Invoice.objects.count(),
             'latest_customers': list(latest_customers),
-            'latest_invoices': list(latest_invoices)
+            'latest_invoices': list(latest_invoices),
+            'latest_applicants': list(latest_applicants)
         })
